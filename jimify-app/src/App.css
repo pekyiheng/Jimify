@@ -3,7 +3,28 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  display: flex;
 }
 .app {
-  width: max-content;
+  width:100%;
+  flex: 1;
+}
+.header {
+  align-self: self-start;
+}
+.widgets {
+  box-sizing: border-box;
+  border: solid gray;
+  margin: 5px;
+  border-width: 10px;
+  min-height: 30vb;
+  min-width: 30vb;
+}
+.navbar {
+  display: flex;
+  justify-content: space-around;
+}
+.divider {
+  border: solid black;
+  border-width: 1px;
 }

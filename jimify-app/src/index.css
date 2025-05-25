@@ -53,19 +53,7 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
-.widgets {
-  border: solid gray;
-  margin: 5px;
-  border-width: 10px;
-}
-.navbar {
-  display: flex;
-  justify-content: space-around;
-}
-.divider {
-  border: solid black;
-  border-width: 1px;
-}
+
 
 @media (prefers-color-scheme: light) {
   :root {
