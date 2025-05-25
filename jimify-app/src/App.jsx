@@ -1,21 +1,16 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import Widget from './Widget.jsx'
+import { Link } from 'react-router-dom'
 import './App.css'
+import { Outlet } from 'react-router-dom'
+import NavBar from './components/NavBar'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
-    <>
-      <div>
-      <Widget content="calories" />
-      </div>
-      <div>
-      <Widget content="weight" />
-      </div>
-    </>
+    <div className='app'>
+      <NavBar />
+      <Outlet />
+    </div>
   )
 }
 
