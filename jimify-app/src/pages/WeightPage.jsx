@@ -18,10 +18,9 @@ const WeightPage = () => {
     }
 
     return (
-        <div>
+        <div className="weightContainer">
             <h1>{weight} KG</h1>
             <h2>Last Updated: {lastUpdated}</h2>
-            
             <div>
                 <ul>
                     {oldEntries.map(entry => (<li>{entry}</li>))}
@@ -31,7 +30,6 @@ const WeightPage = () => {
             <div>
                 <button onClick={handlePrompt}>+ New Entry</button>
             </div>
-            <Outlet/>
         </div>
     )
 }

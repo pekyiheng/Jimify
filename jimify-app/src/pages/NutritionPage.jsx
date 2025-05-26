@@ -1,7 +1,7 @@
 import Widget from '../components/Widget'
 import { Outlet } from 'react-router-dom'
 
-const MainNutritionPage = () => {
+const NutritionPage = () => {
     return (
         <>
           <div>
@@ -15,12 +15,4 @@ const MainNutritionPage = () => {
       )
 }
 
-const NutritionPage = () => {
-    return (
-        <div>
-            <Outlet />
-        </div>
-    )
-}
-
-export {MainNutritionPage, NutritionPage};
+export default NutritionPage;

@@ -5,7 +5,7 @@ import './index.css'
 import App from './App.jsx'
 import CaloriesPage from './pages/CaloriesPage';
 import WeightPage from './pages/WeightPage';
-import { MainNutritionPage, NutritionPage } from './pages/NutritionPage';
+import NutritionPage from './pages/NutritionPage';
 import TrainingPage from './pages/TrainingPage';
 
 const router = createBrowserRouter([
@@ -13,15 +13,9 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
-      { index: true, element: <MainNutritionPage />},
-      {
-        path: "nutritionPage", element: <NutritionPage />, 
-        children: [
-          { index: true, element: <MainNutritionPage /> },
-          { path: "caloriesPage", element: <CaloriesPage />},
-          { path: "weightPage", element: <WeightPage />},
-        ]
-      }, 
+      { index: true, element: <NutritionPage />},
+      { path: "caloriesPage", element: <CaloriesPage />},
+      { path: "weightPage", element: <WeightPage />},
       { path: "trainingPage", element: <TrainingPage /> },
     ],
   },
