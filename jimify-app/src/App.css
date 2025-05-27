@@ -32,3 +32,19 @@
   width:20vb;
   height: 40vb;
 }
+.horizontalListOfBoxes {
+  list-style-type: none;
+  display: inline-flex;
+  column-gap: 10px;
+}
+.verticalListOfBoxes {
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+.listItemInBox {
+  background-color: beige;
+  padding: 12px;
+  border: 1px solid black;
+}
