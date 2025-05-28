@@ -1,10 +1,20 @@
 import { Outlet } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const WeightPage = () => {
     const [weight, setWeight] = useState("XX");
     const [lastUpdated, setLastUpdated] = useState("XX");
     const [oldEntries, setEntries] = useState([]);
+
+    const fetchAPI = async () => {
+        const response = await axios.get("http://localhost:8080/");
+        setWeight(response.data.weight);
+    };
+
+    useEffect(() => {
+        fetchAPI();
+    }, []);
     
     const handlePrompt = () => {
         const value = prompt("New Entry:");
