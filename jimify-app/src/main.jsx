@@ -7,6 +7,7 @@ import CaloriesPage from './pages/CaloriesPage';
 import WeightPage from './pages/WeightPage';
 import NutritionPage from './pages/NutritionPage';
 import TrainingPage from './pages/TrainingPage';
+import LoginPage from './pages/LoginPage';
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,7 @@ const router = createBrowserRouter([
       { path: "caloriesPage", element: <CaloriesPage />},
       { path: "weightPage", element: <WeightPage />},
       { path: "trainingPage", element: <TrainingPage /> },
+      { path: "loginPage", element: <LoginPage /> },
     ],
   },
 ])
