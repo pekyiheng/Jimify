@@ -8,6 +8,7 @@ import WeightPage from './pages/WeightPage';
 import NutritionPage from './pages/NutritionPage';
 import TrainingPage from './pages/TrainingPage';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
       { path: "weightPage", element: <WeightPage />},
       { path: "trainingPage", element: <TrainingPage /> },
       { path: "loginPage", element: <LoginPage /> },
+      { path: "registerPage", element: <RegisterPage /> },
     ],
   },
 ])
