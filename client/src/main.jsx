@@ -9,6 +9,8 @@ import NutritionPage from './pages/NutritionPage';
 import TrainingPage from './pages/TrainingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import OtherLayout from './OtherLayout';
+import DoesNotExistPage from './pages/DoesNotExistPage';
 
 const router = createBrowserRouter([
   {
@@ -19,9 +21,16 @@ const router = createBrowserRouter([
       { path: "caloriesPage", element: <CaloriesPage />},
       { path: "weightPage", element: <WeightPage />},
       { path: "trainingPage", element: <TrainingPage /> },
+    ],
+  }, 
+  {
+    path: "/",
+    element: <OtherLayout />,
+    children: [
       { path: "loginPage", element: <LoginPage /> },
       { path: "registerPage", element: <RegisterPage /> },
-    ],
+      { path: "*", element: <DoesNotExistPage />},
+    ]
   },
 ])
 

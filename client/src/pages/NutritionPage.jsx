@@ -1,5 +1,4 @@
 import Widget from '../components/Widget'
-import { Outlet } from 'react-router-dom'
 
 const NutritionPage = () => {
     return (
