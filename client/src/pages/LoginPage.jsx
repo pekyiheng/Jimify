@@ -1,28 +1,48 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link , useNavigate} from "react-router-dom";
 import '../App.css';
+import axios from "axios";
 
 const LoginPage = () => {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [hiddenTag, setHiddenTag] = useState(true);
+    const navigate = useNavigate();
 
-    const handleSubmit = (event) => {};
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            const res = await axios.post("http://localhost:8080/login/", {username, password});
+            if (res.data == "success") {
+                navigate("/");
+            } else {
+                setHiddenTag(false);
+                console.log("no user");
+            }
+            
+        } 
+        catch(e) {
+            console.log(e);
+        }
+        
+    };
 
     return (
         <div>
             <h2>Login</h2>
             <form onSubmit={handleSubmit}>
                 <label>Username: </label>
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)}/>
+                <input type="text" placeholder="username" value={username} onChange={(e) => setUsername(e.target.value)}/>
                 <br/>
                 <label>Password: </label>
-                <input type="text" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                <input type="text" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
                 <br/>
                 <button type="submit">Login</button>
                 <br/>
-                <label>New here? </label><Link to="/registerPage">Create an account</Link>
+                <p hidden={hiddenTag} id="userNotFoundMessage">Username does not exist or password is wrong</p>
             </form>
+            <label>New here? </label><Link to="/registerPage">Create an account</Link>
         
         </div>
     )

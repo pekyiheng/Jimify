@@ -48,3 +48,6 @@
   padding: 12px;
   border: 1px solid black;
 }
+#userNotFoundMessage, #userExists{
+  color: red;
+}
