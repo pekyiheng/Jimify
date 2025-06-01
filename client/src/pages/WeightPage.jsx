@@ -4,14 +4,6 @@ import axios from "axios";
 const WeightPage = () => {
     const [oldWeight, setWeight] = useState([]);
 
-    const fetchAPI = async () => {
-        const response = await axios.get("http://localhost:8080/");
-        setWeight(response.data.weight);
-    };
-
-    useEffect(() => {
-        fetchAPI();
-    }, []);
     
     const handleNewWeight = () => {
         const value = prompt("New Entry:");
