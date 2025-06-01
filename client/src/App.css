@@ -19,10 +19,19 @@
   border-width: 10px;
   min-height: 30vb;
   min-width: 30vb;
+  border-radius: 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 .navbar {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+  margin: 0 auto;
 }
 .divider {
   border: solid black;
@@ -42,11 +51,16 @@
   display: flex;
   flex-direction: column;
   row-gap: 10px;
+  align-items: center;
+  padding: 0;
 }
 .listItemInBox {
-  background-color: beige;
-  padding: 12px;
+  background-color:cornsilk;
+  padding: 10px;
   border: 1px solid black;
+  border-radius: 20px;
+  text-align: center;
+  width: 200px;
 }
 #userNotFoundMessage, #userExists{
   color: red;

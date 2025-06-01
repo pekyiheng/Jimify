@@ -1,5 +1,4 @@
 import { useState } from "react";
-import '../App.css';
 
 const TrainingPage = () => {
     const [oldWorkoutPlan, setWorkoutPlan] = useState([]);
@@ -13,11 +12,17 @@ const TrainingPage = () => {
         }
     }
 
-    function WorkoutPlan({ name, details }) {
+    const handleDeleteWorkoutPlan = (index) => {
+        const updatedWorkoutPlan = oldWorkoutPlan.filter((_, i) => i !== index);
+        setWorkoutPlan(updatedWorkoutPlan);
+    }
+
+    function WorkoutPlan({ name, details, onDelete }) {
         return (
             <div>
                 <h3>{name}</h3>
                 <p>{details}</p>
+                <button onClick={onDelete}>Delete</button>
             </div>
         );
     }
@@ -33,11 +38,17 @@ const TrainingPage = () => {
         }
     }
 
-    function Workout({ name, time }) {
+    const handleDeleteWorkout = (index) => {
+        const updatedWorkout = oldWorkout.filter((_, i) => i !== index);
+        setWorkoutPlan(updatedWorkout);
+    }
+
+    function Workout({ name, time, onDelete }) {
         return (
             <div>
                 <h3>{name}</h3>
                 <p>{time}</p>
+                <button onClick={onDelete}>Delete</button>
             </div>
         );
     }
@@ -48,8 +59,8 @@ const TrainingPage = () => {
                 <h2>My Workouts</h2>
                 <button onClick={handleNewWorkoutPlan}>+ Create New Workout</button>
                 <ul className="horizontalListOfBoxes">
-                    {oldWorkoutPlan.map(entry => 
-                        (<li className="listItemInBox"><WorkoutPlan name={entry.workout} details={entry.workoutDetails}/></li>))}
+                    {oldWorkoutPlan.map((entry, index) => 
+                        (<li className="listItemInBox" key={index}><WorkoutPlan name={entry.workout} details={entry.workoutDetails} onDelete={() => handleDeleteWorkoutPlan(index)}/></li>))}
                 </ul>
             </div>
 
@@ -57,8 +68,8 @@ const TrainingPage = () => {
                 <h2>Past Workouts</h2>
                 <button onClick={handleNewWorkout}>+ Log Your Workout</button>
                 <ul className="verticalListOfBoxes">
-                    {oldWorkout.map(entry => 
-                        (<li className="listItemInBox"><Workout name={entry.workout} time={entry.time}/></li>))}
+                    {oldWorkout.map((entry, index) => 
+                        (<li className="listItemInBox" key={index}><Workout name={entry.workout} time={entry.time} onDelete={() => handleDeleteWorkout(index)}/></li>))}
                 </ul>
             </div>
         </div>
