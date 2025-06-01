@@ -2,9 +2,7 @@ import { useState } from "react";
 import { Link , useNavigate} from "react-router-dom";
 import '../App.css';
 import { auth } from '../firebase_config'; 
-import { useAuth } from '../AuthContext'; 
 import { signInWithEmailAndPassword } from "firebase/auth";
-
 
 const LoginPage = () => {
 
@@ -29,7 +27,7 @@ const LoginPage = () => {
         } 
         catch(e) {
             console.error("Firebase Authentication Error:", e.message);
-            setHiddenTag(false); // Show an error message to the user
+            setHiddenTag(false);
         }
         
     };

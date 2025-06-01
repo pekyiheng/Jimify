@@ -6,7 +6,7 @@ const Widget = ({content}) => {
         <div className="widgets">
             <Link to= {contentPage}>
                 <h1>
-                    {content}
+                    {content.toUpperCase()}
                 </h1>
             </Link>
         </div>
