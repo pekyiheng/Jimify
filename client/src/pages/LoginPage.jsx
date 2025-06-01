@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Link , useNavigate} from "react-router-dom";
 import '../App.css';
-import axios from "axios";
+import { auth } from '../firebase_config'; 
+import { useAuth } from '../AuthContext'; 
+import { signInWithEmailAndPassword } from "firebase/auth";
+
 
 const LoginPage = () => {
 
@@ -13,17 +16,20 @@ const LoginPage = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const res = await axios.post("http://localhost:8080/login/", {username, password});
+            /* const res = await axios.post("http://localhost:8080/login/", {username, password});
             if (res.data == "success") {
                 navigate("/");
             } else {
                 setHiddenTag(false);
                 console.log("no user");
-            }
+            } */
+            await signInWithEmailAndPassword(auth, username, password);
+            navigate("/");
             
         } 
         catch(e) {
-            console.log(e);
+            console.error("Firebase Authentication Error:", e.message);
+            setHiddenTag(false); // Show an error message to the user
         }
         
     };

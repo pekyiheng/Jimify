@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import '../App.css';
-import axios from "axios";
+import { auth } from '../firebase_config';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 const RegisterPage = () => {
 
@@ -14,16 +15,12 @@ const RegisterPage = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const res = await axios.post("http://localhost:8080/register/", {username, password});
-            if (res.data == "user exist") {
-                console.log(res.body);
-                setHiddenTag(false);
-            } else {
-                navigate("/loginPage");
-            }
+            await createUserWithEmailAndPassword(auth, username, password);
+            navigate("/loginPage");
         }
         catch (e) {
-            console.log(e);
+            console.error("Firebase Authentication Error:", e.message);
+            setHiddenTag(false); 
         }
         
     };
