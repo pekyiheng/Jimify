@@ -65,3 +65,26 @@
 #userNotFoundMessage, #userExists{
   color: red;
 }
+.button {
+  margin: 20px;
+}
+.input {
+  height: 100%;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  border: 2px solid black;
+  border-radius: 40px;
+  font-size: 16px;
+  padding: 20px 45px 20px 20px;
+}
+.loginIcon {
+  position: relative;
+  right: 40px;
+}
+.inputContainer {
+  display: flex;
+  align-items: center;
+  margin: 10px;
+}
