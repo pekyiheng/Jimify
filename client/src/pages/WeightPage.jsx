@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { collection, getDocs, addDoc, deleteDoc, doc, query, where } from "firebase/firestore";
 import { db, auth } from "../firebase_config"
 import { onAuthStateChanged } from "firebase/auth";

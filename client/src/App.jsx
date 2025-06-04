@@ -12,13 +12,11 @@ function App() {
   const [loadingAuth, setLoadingAuth] = useState(true);
 
   useEffect(() => {
-    // Set up the Firebase auth state listener
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser); // Update the user state
+      setUser(currentUser);
       setLoadingAuth(false);
     });
 
-    // Cleanup function: unsubscribe from the listener when the component unmounts
     return () => unsubscribe();
   }, []); 
 

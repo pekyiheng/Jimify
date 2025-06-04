@@ -17,13 +17,6 @@ const LoginPage = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            /* const res = await axios.post("http://localhost:8080/login/", {username, password});
-            if (res.data == "success") {
-                navigate("/");
-            } else {
-                setHiddenTag(false);
-                console.log("no user");
-            } */
             await signInWithEmailAndPassword(auth, email, password);
             navigate("/");
             
