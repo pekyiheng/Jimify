@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { collection, getDocs, addDoc, deleteDoc, doc, query, where } from "firebase/firestore";
+import { collection, getDoc, getDocs, addDoc, deleteDoc, doc, query, where } from "firebase/firestore";
 import { db, auth } from "../firebase_config"
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -8,7 +8,6 @@ const WeightPage = () => {
     const [oldWeight, setWeight] = useState([]);
     const [userId, setUserId] = useState(null);
 
-    //check if valid user
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -20,19 +19,26 @@ const WeightPage = () => {
     }, [])
 
     const fetchWeights = async (uid) => {
-        const colRef = collection(db, "User_Weight");
-        const q = query(colRef, where("uid", "==", uid));
-        const snapshot = await getDocs(q);
-        const data = snapshot.docs.map((docSnap) => {
+        const userWeightColRef = collection(db, "Users", uid, "User_Weight");
+        
+        try {
+            const docSnap = await getDocs(userWeightColRef);
+            const data = docSnap.docs.map((docSnap) => {
             const docData = docSnap.data();
             return {
                 id: docSnap.id,
                 value: docData.value,
-                uid: docData.uid,
                 time: docData.time.toDate(),
             };
         });
+
         setWeight(data);
+
+        }
+        catch (e) {
+            console.error(e);
+            return null;
+        }
     }
 
     const handleNewWeight = async () => {
@@ -42,16 +48,16 @@ const WeightPage = () => {
         if (!isNaN(value)) {
 
             const time = new Date();
-        
             const entry = {
-                value, time, uid: auth.currentUser?.uid,
+                value, time,
             };
 
             
         console.log("submitting entry:", entry);
 
             try {
-                const docRef = await addDoc(collection(db, "User_Weight"), entry);
+                const userWeightColRef = collection(db, "Users", userId, "User_Weight");
+                const docRef = await addDoc(userWeightColRef, entry);
                 console.log("Successfully added to Firestore:", docRef.id);
                 setWeight([...oldWeight, { ...entry, id: docRef.id }]);
             } catch (err) {
@@ -62,7 +68,7 @@ const WeightPage = () => {
 
     const handleDeleteWeight = async (id) => {
         try {
-            await deleteDoc(doc(db, "User_Weight", id));
+            await deleteDoc(doc(db, "Users", userId, "User_Weight", id));
             const updatedWeights = oldWeight.filter((entry) => entry.id !== id);
             setWeight(updatedWeights);
         } catch (err) {
