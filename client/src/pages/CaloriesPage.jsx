@@ -1,12 +1,12 @@
 import AddFood from "../components/AddFood";
 import { formatDateToYYYYMMDD } from "../helper";
 import { useState, useEffect } from "react";
-import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, query, where } from "firebase/firestore";
+import { getDoc, doc, } from "firebase/firestore";
 import { db, auth } from "../firebase_config"
 import { onAuthStateChanged } from "firebase/auth";
 
 const CaloriesPage = () => {
-    const [totalCalories, setTotalCalories] = useState(0); //TODO: Dynamically retrieve value from db
+    const [totalCalories, setTotalCalories] = useState(0);
     const [userId, setUserId] = useState(null);
     const [curDate, setCurDate] = useState(new Date())
 
@@ -25,7 +25,11 @@ const CaloriesPage = () => {
 
         try {
             const docSnap = await getDoc(userCaloriesDocRef);
-            const newCalories = docSnap.data().totalCalories;
+            let newCalories = 0;
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                newCalories = data.totalCalories || 0;
+            }
             setTotalCalories(newCalories);
         }
         catch (e) {
@@ -33,6 +37,10 @@ const CaloriesPage = () => {
             setTotalCalories(0);
             return null;
         }
+    }
+
+    const handleFoodChange = () => {
+        fetchCalories(userId);
     }
 
 
@@ -48,9 +56,9 @@ const CaloriesPage = () => {
                 </button>
             </header>
             <p>Calories: {totalCalories}</p>
-            <AddFood mealType="Breakfast" />
-            <AddFood mealType="Lunch" />
-            <AddFood mealType="Dinner" />
+            <AddFood mealType="Breakfast" curDate={formatDateToYYYYMMDD(curDate)} userId={userId} onFoodChange={handleFoodChange} />
+            <AddFood mealType="Lunch" curDate={formatDateToYYYYMMDD(curDate)} userId={userId} onFoodChange={handleFoodChange} />
+            <AddFood mealType="Dinner" curDate={formatDateToYYYYMMDD(curDate)} userId={userId} onFoodChange={handleFoodChange} />
         </div>
     );
 }

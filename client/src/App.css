@@ -38,8 +38,14 @@
   border-width: 1px;
 }
 .addfood {
-  width:20vb;
-  height: 40vb;
+  min-height: 40vb;
+  border: solid black;
+  border-radius: 10%;
+  margin: 5px;
+  padding: 10px;
+}
+#deleteFoodBtn {
+  margin: 10px;
 }
 .horizontalListOfBoxes {
   list-style-type: none;
