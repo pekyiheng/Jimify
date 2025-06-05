@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { collection, getDoc, getDocs, addDoc, deleteDoc, doc, query, where } from "firebase/firestore";
+import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, query, where } from "firebase/firestore";
 import { db, auth } from "../firebase_config"
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -51,15 +51,15 @@ const WeightPage = () => {
             const entry = {
                 value, time,
             };
-
             
-        console.log("submitting entry:", entry);
+            console.log("submitting entry:", entry);
 
             try {
-                const userWeightColRef = collection(db, "Users", userId, "User_Weight");
-                const docRef = await addDoc(userWeightColRef, entry);
-                console.log("Successfully added to Firestore:", docRef.id);
-                setWeight([...oldWeight, { ...entry, id: docRef.id }]);
+                const docId = Date.now().toString();
+                const userWeightDocRef = doc(db, "Users", userId, "User_Weight", docId);
+                const docRef = await setDoc(userWeightDocRef, entry);
+                console.log("Successfully added to Firestore:", docId);
+                setWeight([...oldWeight, { ...entry, id: docId }]);
             } catch (err) {
                 console.error("Error adding weight:", err);
             }
