@@ -98,3 +98,6 @@
   display: flex;
   justify-content: space-evenly;
 }
+.chartContainer {
+  margin: 20px;
+}
