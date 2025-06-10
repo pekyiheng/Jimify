@@ -135,8 +135,8 @@ const TrainingPage = () => {
 
     const handleNewExercise = () => {
         if (!selectedExercises.some(ex => ex.exercise == newExercise)) { // no duplicate exercises in array
-            setSelectedExercises([...selectedExercises, {exercise: newExercise, sets: 3, reps: 10}]);
-            setNewExercise(exerciseOptions.length > 0 ? exerciseOptions[0] : "");
+            setSelectedExercises([...selectedExercises, {exercise: newExercise, weight: 60, sets: 3, reps: 10}]);
+            setNewExercise(exerciseOptions.length > 0 ? exerciseOptions[0].exercise : "");
         } else {
             console.error("Error adding exercise");
         }
@@ -147,20 +147,21 @@ const TrainingPage = () => {
             <div>
                 <h3>{name}</h3>
                 {exercise}
-                <button onClick={onDelete}>Delete</button>
+                <button onClick={onDelete} className="button">Delete</button>
             </div>
         );
     }
 
     const handleNewWorkout = async () => {
         const workout = prompt("New Workout:");
-        const isMatch = oldWorkoutPlan.some(
-            plan => plan.workout.toLowerCase() == workout.toLowerCase() 
+        const isMatch = oldWorkoutPlan.find(
+            plan => plan.workoutName.toLowerCase() == workout.toLowerCase() 
         );
         if (workout && isMatch) {
             const time = new Date();
             const entry = {
-                workout, time,
+                workout: isMatch.workoutName, 
+                time: time,
             };
             
             console.log("submitting entry:", entry);
@@ -192,7 +193,7 @@ const TrainingPage = () => {
             <div>
                 <h3>{name}</h3>
                 <p>{time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
-                <button onClick={onDelete}>Delete</button>
+                <button onClick={onDelete} className="button">Delete</button>
             </div>
         );
     }
@@ -206,7 +207,7 @@ const TrainingPage = () => {
                 </div>
 
                 {showForm && (
-                    <div>
+                    <div className="weightFormContent">
                         <h3>Create New Workout Plan</h3>
                         <form onSubmit={handleNewWorkoutPlan}>
                             <label>Workout Name: </label>
@@ -223,25 +224,41 @@ const TrainingPage = () => {
                                 <button type="button" onClick={handleNewExercise} className="button">Add Exercise</button>
                             </div>
 
-                            <ul>
+                            <ul className="listWithNoPointers">
                                 {selectedExercises.map((ex, index) => (
                                     <li key={index}>
                                         <h3>{ex.exercise}</h3>
-                                        Sets:
-                                        <input type="number" value={ex.sets} onChange={(e) => {
-                                            const updatedExercises = [...selectedExercises];
-                                            updatedExercises[index].sets = parseInt(e.target.value);
-                                            setSelectedExercises(updatedExercises);
-                                        }}/>
+                                        
+                                        <div className="exerciseItem">
+                                            <div>
+                                                <label>Weight: </label>
+                                                <input type="number" value={ex.weight} onChange={(e) => {
+                                                    const updatedExercises = [...selectedExercises];
+                                                    updatedExercises[index].weight = parseInt(e.target.value);
+                                                    setSelectedExercises(updatedExercises);
+                                                }}/>
+                                                KG
+                                                <br/>
+                                                <label>Sets: </label> 
+                                                <input type="number" value={ex.sets} onChange={(e) => {
+                                                    const updatedExercises = [...selectedExercises];
+                                                    updatedExercises[index].sets = parseInt(e.target.value);
+                                                    setSelectedExercises(updatedExercises);
+                                                }}/>
+                                                <br/>
+                                                <label>Reps: </label> 
+                                                <input type="number" value={ex.reps} onChange={(e) => {
+                                                    const updatedExercises = [...selectedExercises];
+                                                    updatedExercises[index].reps = parseInt(e.target.value);
+                                                    setSelectedExercises(updatedExercises);
+                                                }}/>
+                                            </div>
+                                            <button onClick={() => setSelectedExercises(selectedExercises.filter((_, i) => i !== index))} className="button">Remove Exercise</button>
+                                        </div>
+                                            
+                                        
 
-                                        Reps:
-                                        <input type="number" value={ex.reps} onChange={(e) => {
-                                            const updatedExercises = [...selectedExercises];
-                                            updatedExercises[index].reps = parseInt(e.target.value);
-                                            setSelectedExercises(updatedExercises);
-                                        }}/>
-
-                                        <button onClick={() => setSelectedExercises(selectedExercises.filter((_, i) => i !== index))}>Remove Exercise</button>
+                                        
                                     </li>
                                 ))}
                             </ul>

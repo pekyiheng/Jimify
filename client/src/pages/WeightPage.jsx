@@ -115,7 +115,7 @@ const WeightPage = () => {
         <div className="weightContainer">
             {oldWeight.length > 0 ? (
                 <>
-                <h1>{oldWeight[oldWeight.length - 1].value} KG</h1>
+                <h1>Current Weight: {oldWeight[oldWeight.length - 1].value} KG</h1>
                 <h2>Last Updated: {oldWeight[oldWeight.length - 1].time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</h2>
                 </>)
                 : <h2>No Entries Yet</h2>
