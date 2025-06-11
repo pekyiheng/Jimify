@@ -4,6 +4,7 @@ import { db, auth } from "../firebase_config"
 import { onAuthStateChanged } from "firebase/auth";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import WeightWidget from '../components/WeightWidget';
 
 const WeightPage = () => {
 

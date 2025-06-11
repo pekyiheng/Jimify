@@ -56,6 +56,7 @@ const NutritionPage = () => {
         </div>
         <div className='widgets'>
           <Link to="/weightPage">
+            <h2>Weight</h2>
             <WeightWidget />
           </Link>
         </div>
