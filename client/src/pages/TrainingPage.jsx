@@ -8,23 +8,42 @@ const TrainingPage = () => {
     const [oldWorkout, setWorkout] = useState([]);
     const [userId, setUserId] = useState(null);
 
-    const [workoutName, setWorkoutName] = useState("");
+    const [workoutPlanName, setWorkoutPlanName] = useState("");
     const [newExercise, setNewExercise] = useState("");
     const [selectedExercises, setSelectedExercises] = useState([]);
     const [exerciseOptions, setExerciseOptions] = useState([]);
-    const [showForm, setShowForm] = useState(false);
+    const [showWorkoutPlanForm, setShowWorkoutPlanForm] = useState(false);
+    const [showWorkoutForm, setShowWorkoutForm] = useState(false);
+    const [workoutPlanForLogging, setWorkoutPlanForLogging] = useState("");
+    const [workoutForLogging, setWorkoutForLogging] = useState([]);
 
     useEffect(() => {
-            const unsubscribe = onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    setUserId(user.uid);
-                    fetchWorkoutPlan(user.uid);
-                    fetchWorkout(user.uid);
-                    fetchExercises();
-                }
-            });
-            return () => unsubscribe();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUserId(user.uid);
+                fetchWorkoutPlan(user.uid);
+                fetchWorkout(user.uid);
+                fetchExercises();
+            }
+        });
+        return () => unsubscribe();
     }, [])
+
+    useEffect(() => {
+        if (oldWorkoutPlan.length >= 1) {
+            const plan = oldWorkoutPlan[0];
+            setWorkoutPlanForLogging(plan.workoutName);
+            setWorkoutForLogging(plan.exercises.map(ex => ({
+                ...JSON.parse(JSON.stringify(ex)),
+                expectedWeight: ex.weight,
+                expectedSets: ex.sets,
+                expectedReps: ex.reps,
+            })));
+        } else {
+            setWorkoutPlanForLogging("");
+            setWorkoutForLogging([]);
+        }
+    }, [showWorkoutForm, oldWorkoutPlan])
     
     const fetchWorkoutPlan = async (uid) => {
         const userWorkoutPlanColRef = collection(db, "Users", uid, "User_Workout_Plan");
@@ -60,6 +79,7 @@ const TrainingPage = () => {
                 return {
                     id: docSnap.id,
                     workout: docData.workout,
+                    exercises: docData.exercises,
                     time: docData.time.toDate(),
                 };
             });
@@ -102,7 +122,7 @@ const TrainingPage = () => {
         e.preventDefault();
         const time = new Date();
         const entry = {
-            workoutName: workoutName,
+            workoutName: workoutPlanName,
             exercises: selectedExercises,
             time,
         };
@@ -115,9 +135,9 @@ const TrainingPage = () => {
             const docRef = await setDoc(userWorkoutPlanDocRef, entry);
             console.log("Successfully added to Firestore:", docId);
             setWorkoutPlan([...oldWorkoutPlan, { ...entry, id: docId }]);
-            setWorkoutName("");
+            setWorkoutPlanName("");
             setSelectedExercises([]);
-            setShowForm(false);
+            setShowWorkoutPlanForm(false);
         } catch (err) {
             console.error("Error adding workout plan:", err);
         }
@@ -152,17 +172,14 @@ const TrainingPage = () => {
         );
     }
 
-    const handleNewWorkout = async () => {
-        const workout = prompt("New Workout:");
-        const isMatch = oldWorkoutPlan.find(
-            plan => plan.workoutName.toLowerCase() == workout.toLowerCase() 
-        );
-        if (workout && isMatch) {
-            const time = new Date();
-            const entry = {
-                workout: isMatch.workoutName, 
+    const handleNewWorkout = async (e) => {
+        e.preventDefault();
+        const time = new Date();
+        const entry = {
+                workout: workoutPlanForLogging, 
+                exercises: workoutForLogging,
                 time: time,
-            };
+        };
             
             console.log("submitting entry:", entry);
 
@@ -172,11 +189,14 @@ const TrainingPage = () => {
                 const docRef = await setDoc(userWorkoutDocRef, entry);
                 console.log("Successfully added to Firestore:", docId);
                 setWorkout([...oldWorkout, { ...entry, id: docId }]);
+                setWorkoutForLogging([]);
+                setWorkoutPlanForLogging("");
+                setShowWorkoutForm(false);
             } catch (err) {
                 console.error("Error adding workout:", err);
             }
-        }
     }
+
 
     const handleDeleteWorkout = async (id) => {
         try {
@@ -188,31 +208,41 @@ const TrainingPage = () => {
         }
     }
 
-    function Workout({ name, time, onDelete }) {
+    function Workout({ name, exercises = [], time, onDelete }) {
         return (
             <div>
                 <h3>{name}</h3>
                 <p>{time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
+                <ul>
+                    {exercises.map((ex, index) => (
+                        <li key={index}>
+                            <p>{ex.exercise}</p>
+                            <p>Expected Weight: {ex.expectedWeight} | Actual: {ex.weight}</p>
+                            <p>Expected Sets: {ex.expectedSets} | Actual: {ex.sets}</p>
+                            <p>Expected Reps: {ex.expectedReps} | Actual: {ex.reps}</p>
+                        </li>
+                    ))}
+                </ul>
                 <button onClick={onDelete} className="button">Delete</button>
             </div>
         );
     }
-    
+ 
     return (
         <div>
             <div>
                 <h2>My Workouts</h2>
                 <div className="buttonContainer">
-                    <button onClick={() => setShowForm(true)} className="button">+ Create New Workout Plan</button>
+                    <button onClick={() => setShowWorkoutPlanForm(true)} className="button">+ Create New Workout Plan</button>
                 </div>
 
-                {showForm && (
-                    <div className="weightFormContent">
+                {showWorkoutPlanForm && (
+                    <div className="workoutPlanFormContent">
                         <h3>Create New Workout Plan</h3>
                         <form onSubmit={handleNewWorkoutPlan}>
                             <label>Workout Name: </label>
-                            <input type="text" value={workoutName} 
-                            onChange={(e) => setWorkoutName(e.target.value)} required />
+                            <input type="text" value={workoutPlanName} 
+                            onChange={(e) => setWorkoutPlanName(e.target.value)} required />
 
                             <div> 
                                 <label>Add Exercises: </label>
@@ -257,13 +287,11 @@ const TrainingPage = () => {
                                         </div>
                                             
                                         
-
-                                        
                                     </li>
                                 ))}
                             </ul>
                             <button type="submit" className="button">Confirm Workout Plan</button>
-                            <button onClick={() => setShowForm(false)} className="button">Cancel</button>
+                            <button onClick={() => setShowWorkoutPlanForm(false)} className="button">Cancel</button>
                         </form>
                     </div>
                 )}
@@ -277,7 +305,7 @@ const TrainingPage = () => {
                                 exercise={
                                     <ul>
                                         {entry.exercises.map((e, index) => (
-                                            <li key={index}>{e.exercise} - {e.sets} sets x {e.reps} reps</li>
+                                            <li key={index}>{e.exercise} ({e.weight}KG) - {e.sets} sets x {e.reps} reps</li>
                                         ))}
                                     </ul>
                                 }
@@ -288,11 +316,80 @@ const TrainingPage = () => {
             <div>
                 <h2>Past Workouts</h2>
                 <div className="buttonContainer">
-                    <button onClick={handleNewWorkout} className="button">+ Log Your Workout</button>
+                    <button onClick={() => setShowWorkoutForm(true)} className="button">+ Log Your Workout</button>
                 </div>
+                
+                 {showWorkoutForm && (
+                    <div className="workoutPlanFormContent">
+                        <h3>Log your past workout</h3>
+                        <form onSubmit={handleNewWorkout}>
+                            <label>Workout Name: </label>
+                            <select value={workoutPlanForLogging} 
+                                onChange={(e) => {
+                                    const selectedName = e.target.value;
+                                    setWorkoutPlanForLogging(selectedName);
+                                    const selectedPlan = oldWorkoutPlan.find(plan => plan.workoutName === selectedName);
+                                    if (selectedPlan) {
+                                        setWorkoutForLogging(selectedPlan.exercises.map(ex => ({
+                                            ...JSON.parse(JSON.stringify(ex)),
+                                            expectedWeight: ex.weight,
+                                            expectedSets: ex.sets,
+                                            expectedReps: ex.reps
+                                        })))
+                                    }}
+                                }
+                                required
+                            >
+                                    {oldWorkoutPlan.map((plan) => (
+                                        <option key={plan.id} value={plan.workoutName}>{plan.workoutName}</option>
+                                    ))}
+                            </select>
+
+                            <ul className="listWithNoPointers">
+                                <h3>{workoutPlanForLogging}</h3>
+                                
+                                {workoutForLogging.map((ex, index) => (
+                                    <li key={index}>
+                                        <div className="exerciseItem">
+                                            <h3>{ex.exercise}</h3>
+                                            <div>
+
+                                                <label>Expected Weight: {ex.expectedWeight} | Reality: </label>
+                                                <input type="number" onChange={(e) => {
+                                                    const updated = [...workoutForLogging];
+                                                    updated[index].weight = parseInt(e.target.value);
+                                                    setWorkoutForLogging(updated);
+                                                }}/>
+                                                KG
+                                                <br/>
+                                                <label>Expected Sets: {ex.expectedSets} | Reality: </label> 
+                                                <input type="number" onChange={(e) => {
+                                                    const updated = [...workoutForLogging];
+                                                    updated[index].sets = parseInt(e.target.value);
+                                                    setWorkoutForLogging(updated);
+                                                }}/>
+                                                <br/>
+                                                <label>Expected Reps: {ex.expectedReps} | Reality: </label> 
+                                                <input type="number" onChange={(e) => {
+                                                    const updated = [...workoutForLogging];
+                                                    updated[index].reps = parseInt(e.target.value);
+                                                    setWorkoutForLogging(updated);
+                                                }}/>
+                                            </div>
+                                        </div>
+                                            
+                                    </li>
+                                ))}
+                            </ul>
+                            <button type="submit" className="button">Confirm Logged Workout</button>
+                            <button onClick={() => setShowWorkoutForm(false)} className="button">Cancel</button>
+                        </form>
+                    </div>
+                )}
+
                 <ul className="verticalListOfBoxes">
                     {oldWorkout.map((entry, index) => 
-                        (<li className="listItemInBox" key={entry.id}><Workout name={entry.workout} time={entry.time} onDelete={() => handleDeleteWorkout(entry.id)}/></li>))}
+                        (<li className="listItemInBox" key={entry.id}><Workout name={entry.workout} exercises={entry.exercises} time={entry.time} onDelete={() => handleDeleteWorkout(entry.id)}/></li>))}
                 </ul>
             </div>
         </div>
