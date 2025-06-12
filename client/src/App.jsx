@@ -5,6 +5,7 @@ import NavBar from './components/NavBar'
 import Header from './components/Header'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { auth } from './firebase_config';
+import ExperienceBar from './components/ExperienceBar'
 //import { useAuth } from './AuthContext'
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
         <Header />
         <Outlet />
         <NavBar />
+        <ExperienceBar />
       </div>
     )
   } else {

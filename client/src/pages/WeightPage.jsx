@@ -130,7 +130,7 @@ const WeightPage = () => {
                 <button onClick={handleNewWeight}>+ New Entry</button>
             </div>
 
-            <div>
+            <div className="weightHistoryContainer">
                 <ul className="verticalListOfBoxes">
                     {oldWeight.map((entry, index) => 
                         (<li className="listItemInBox" key={entry.id}><WeightEntry weight={entry.value} time={entry.time} onDelete={() => handleDeleteWeight(entry.id)}/></li>))}

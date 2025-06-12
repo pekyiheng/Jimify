@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, query, where } from "firebase/firestore";
+import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, updateDoc, increment, query, where } from "firebase/firestore";
 import { db, auth } from "../firebase_config"
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -17,6 +17,9 @@ const TrainingPage = () => {
     const [workoutPlanForLogging, setWorkoutPlanForLogging] = useState("");
     const [workoutForLogging, setWorkoutForLogging] = useState([]);
 
+    const [oldWeight, setWeight] = useState([]); // fetch user weight for exp calc
+
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -24,6 +27,7 @@ const TrainingPage = () => {
                 fetchWorkoutPlan(user.uid);
                 fetchWorkout(user.uid);
                 fetchExercises();
+                fetchWeights(user.uid);
             }
         });
         return () => unsubscribe();
@@ -81,6 +85,7 @@ const TrainingPage = () => {
                     workout: docData.workout,
                     exercises: docData.exercises,
                     time: docData.time.toDate(),
+                    exp: docData.exp,
                 };
             });
     
@@ -112,6 +117,29 @@ const TrainingPage = () => {
             }
         }
 
+        catch (e) {
+            console.error(e);
+            return null;
+        }
+    }
+
+    const fetchWeights = async (uid) => {
+        const userWeightColRef = collection(db, "Users", uid, "User_Weight");
+        
+        try {
+            const docSnap = await getDocs(userWeightColRef);
+            const data = docSnap.docs.map((docSnap) => {
+                const docData = docSnap.data();
+                return {
+                    id: docSnap.id,
+                    value: docData.value,
+                    time: docData.time.toDate(),
+                };
+        });
+
+        setWeight(data);
+
+        }
         catch (e) {
             console.error(e);
             return null;
@@ -175,10 +203,13 @@ const TrainingPage = () => {
     const handleNewWorkout = async (e) => {
         e.preventDefault();
         const time = new Date();
+        const userWeight = oldWeight[oldWeight.length-1]?.value ?? 100; // use 100kg to calculate exp if weight not logged
+        const exp = workoutForLogging.map(ex => Number(Math.round(ex.weight / userWeight * ex.sets * ex.reps))).reduce((a, b) => a + b, 0);
         const entry = {
                 workout: workoutPlanForLogging, 
                 exercises: workoutForLogging,
                 time: time,
+                exp: exp
         };
             
             console.log("submitting entry:", entry);
@@ -195,10 +226,22 @@ const TrainingPage = () => {
             } catch (err) {
                 console.error("Error adding workout:", err);
             }
+
+            try {
+                await updateDoc(doc(db, "Users", userId), { 
+                    exp: increment(exp)
+                });
+                console.log("User EXP updated");
+            } catch (err) {
+                console.error("Error updating EXP:", err);
+            }
     }
 
 
     const handleDeleteWorkout = async (id) => {
+        
+        const exp = oldWorkout.find((entry) => entry.id == id).exp;
+
         try {
             await deleteDoc(doc(db, "Users", userId, "User_Workout", id));
             const updatedWorkout = oldWorkout.filter((entry) => entry.id !== id);
@@ -206,17 +249,25 @@ const TrainingPage = () => {
         } catch (err) {
             console.error("Error deleting workout:", err);
         }
+
+        try {
+            await updateDoc(doc(db, "Users", userId), { 
+                exp: increment(-exp)
+            });
+        } catch (err) {
+            console.error("Error updating EXP:", err);
+        }
     }
 
     function Workout({ name, exercises = [], time, onDelete }) {
         return (
             <div>
                 <h3>{name}</h3>
-                <p>{time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
-                <ul>
+                <p>Date of Workout: {time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
+                <ul className="listWithNoPointers">
                     {exercises.map((ex, index) => (
-                        <li key={index}>
-                            <p>{ex.exercise}</p>
+                        <li key={index} className="exerciseListItem">
+                            <h4>{ex.exercise}</h4>
                             <p>Expected Weight: {ex.expectedWeight} | Actual: {ex.weight}</p>
                             <p>Expected Sets: {ex.expectedSets} | Actual: {ex.sets}</p>
                             <p>Expected Reps: {ex.expectedReps} | Actual: {ex.reps}</p>

@@ -66,13 +66,13 @@
   border: 1px solid black;
   border-radius: 20px;
   text-align: center;
-  width: 200px;
+  width: 30%;
 }
 #userNotFoundMessage, #userExists{
   color: red;
 }
 .button {
-  margin: 20px;
+  margin: 10px;
 }
 .button:hover {
   background-color: #e99393;
@@ -123,9 +123,16 @@
 }
 .listWithNoPointers {
   list-style-type: none;
+  padding: 10px;
 }
 .exerciseItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.exerciseListItem {
+  margin-bottom: 20px;
+}
+.weightHistoryContainer {
+  width: 100%;
 }
