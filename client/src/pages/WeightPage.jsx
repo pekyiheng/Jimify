@@ -4,11 +4,17 @@ import { db } from "../firebase_config"
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { useUser } from "../UserContext";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import { storage } from "../firebase_config"
+
 
 const WeightPage = () => {
 
     const [oldWeight, setWeight] = useState([]);
     const { userId } = useUser();
+    const [newWeight, setNewWeight] = useState("");
+    const [imageFile, setImageFile] = useState(null);
+
 
     useEffect(() => {
         fetchWeights(userId);
@@ -25,6 +31,7 @@ const WeightPage = () => {
                     id: docSnap.id,
                     value: docData.value,
                     time: docData.time.toDate(),
+                    imageUrl: docData.imageUrl || null,
                 };
         });
 
@@ -38,17 +45,28 @@ const WeightPage = () => {
     }
 
     const handleNewWeight = async () => {
-        const input = prompt("New Entry (KG):");
-        const value = parseFloat(input);
-        
-        if (!isNaN(value)) {
+        const value = parseFloat(newWeight);
+        if (isNaN(value)) return alert("Please enter a valid number");
 
-            const time = new Date();
-            const entry = {
-                value, time,
-            };
+
+        const time = new Date();
+        let imageUrl = "";
+
+        if (imageFile) {
+            try {
+                const storageRef = ref(storage, `Users/${userId}/WeightPhotos/${Date.now()}.jpg`)
+                await uploadBytes(storageRef, imageFile);
+                imageUrl = await getDownloadURL(storageRef);
+            } catch (err) {
+                console.error("Failed to upload image", err);
+            }
+        }
+
+        const entry = {
+            value, time, ...(imageUrl && { imageUrl })
+        };
             
-            console.log("submitting entry:", entry);
+        console.log("submitting entry:", entry);
 
             try {
                 const docId = Date.now().toString();
@@ -56,10 +74,11 @@ const WeightPage = () => {
                 const docRef = await setDoc(userWeightDocRef, entry);
                 console.log("Successfully added to Firestore:", docId);
                 setWeight([...oldWeight, { ...entry, id: docId }]);
+                setNewWeight("");
+                setImageFile(null);
             } catch (err) {
                 console.error("Error adding weight:", err);
             }
-        }
     }
 
     const handleDeleteWeight = async (id) => {
@@ -72,11 +91,12 @@ const WeightPage = () => {
         }
     }
     
-    function WeightEntry({ weight, time, onDelete }) {
+    function WeightEntry({ weight, time, imageUrl, onDelete }) {
         return (
             <div>
                 <h3>{weight} KG</h3>
                 <p>{time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
+                {imageUrl && <img src={imageUrl} alt="Progress" width="150px" style={{ borderRadius: "10px" }}/>}
                 <button onClick={onDelete}>Delete</button>
             </div>
         );
@@ -120,13 +140,24 @@ const WeightPage = () => {
             </div>
             
             <div>
-                <button onClick={handleNewWeight}>+ New Entry</button>
+                <input 
+                    type="number"
+                    placeholder="Enter Weight (KG)"
+                    value={newWeight}
+                    onChange={(e) => setNewWeight(e.target.value)}
+                />
+                <input 
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImageFile(e.target.files[0])}
+                />
+                <button onClick={handleNewWeight} disabled={!newWeight}>Submit Weight Entry</button>
             </div>
 
             <div className="weightHistoryContainer">
                 <ul className="verticalListOfBoxes">
                     {oldWeight.map((entry, index) => 
-                        (<li className="listItemInBox" key={entry.id}><WeightEntry weight={entry.value} time={entry.time} onDelete={() => handleDeleteWeight(entry.id)}/></li>))}
+                        (<li className="listItemInBox" key={entry.id}><WeightEntry weight={entry.value} time={entry.time} imageUrl={entry.imageUrl} onDelete={() => handleDeleteWeight(entry.id)}/></li>))}
                 </ul>
             </div>
         </div>

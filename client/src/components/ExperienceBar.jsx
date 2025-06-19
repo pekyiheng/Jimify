@@ -37,7 +37,7 @@ const ExperienceBar = () => {
         <div>
             Level: {level}
             <br/>
-            EXP Progress: <progress value={exp % 100} max={100} />
+            EXP Progress: <progress value={exp % 100} max={100} /> {exp % 100}%
         </div>
     )
 }

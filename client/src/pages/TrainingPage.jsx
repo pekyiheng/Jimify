@@ -198,7 +198,13 @@ const TrainingPage = () => {
         e.preventDefault();
         const time = new Date();
         const userWeight = oldWeight[oldWeight.length-1]?.value ?? 100; // use 100kg to calculate exp if weight not logged
-        const expInc = workoutForLogging.map(ex => Number(Math.round(ex.weight / userWeight * ex.sets * ex.reps))).reduce((a, b) => a + b, 0);
+        const expInc = workoutForLogging.map(ex => {
+            if (ex.weight >= ex.expectedWeight && ex.sets >= ex.expectedSets && ex.reps >= ex.expectedReps) {
+                return Number(Math.round(ex.weight / userWeight * ex.sets * ex.reps * 1.1))
+            } else {
+                return Number(Math.round(ex.weight / userWeight * ex.sets * ex.reps))
+            }
+        }).reduce((a, b) => a + b, 0);
         const entry = {
                 workout: workoutPlanForLogging, 
                 exercises: workoutForLogging,
@@ -361,6 +367,7 @@ const TrainingPage = () => {
             <div>
                 <h2>Past Workouts</h2>
                 <div className="buttonContainer">
+                    <p className="spacingBelow">Tip: Hitting your workout expectations grants extra EXP!</p>
                     <button onClick={() => setShowWorkoutForm(true)} className="button">+ Log Your Workout</button>
                 </div>
                 
