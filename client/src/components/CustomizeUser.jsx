@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { db, auth } from "../firebase_config"
-import { onAuthStateChanged } from "firebase/auth";
 import { getDoc, setDoc, doc, } from "firebase/firestore";
+import { useUser } from "../UserContext";
 
 const CustomizeUser = () => {
 
+    const { userId } = useUser();
     const [showDialog, setShowDialog] = useState(false);
     const dialogRef = useRef(null);
     const [username, setUsername] = useState('');
@@ -17,12 +18,7 @@ const CustomizeUser = () => {
     const [goal, setGoal] = useState('maintain');
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                fetchUserProfile(user.uid);
-            }
-        });
-        return () => unsubscribe();
+        fetchUserProfile(userId);
     }, []);
 
     const fetchUserProfile = async (uid) => {

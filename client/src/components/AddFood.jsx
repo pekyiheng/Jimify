@@ -3,6 +3,7 @@ import { getDoc, updateDoc, setDoc, deleteField, doc, increment } from "firebase
 import { db, auth } from "../firebase_config"
 import { onAuthStateChanged } from "firebase/auth";
 import Popup from 'reactjs-popup';
+import { useUser } from "../UserContext";
 
 const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
     const [foodList, setFoodList] = useState([]);
@@ -11,13 +12,7 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
     
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                fetchFoodList(user.uid);
-            }
-            console.log(curDate);
-        });
-        return () => unsubscribe();
+        fetchFoodList(userId);
     }, [curDate]);
 
     const fetchFoodList = async (uid) => {

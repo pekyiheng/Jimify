@@ -1,24 +1,17 @@
 import { useState, useEffect } from "react";
 import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, query, where } from "firebase/firestore";
-import { db, auth } from "../firebase_config"
-import { onAuthStateChanged } from "firebase/auth";
+import { db } from "../firebase_config"
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import WeightWidget from '../components/WeightWidget';
+import { useUser } from "../UserContext";
 
 const WeightPage = () => {
 
     const [oldWeight, setWeight] = useState([]);
-    const [userId, setUserId] = useState(null);
+    const { userId } = useUser();
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setUserId(user.uid);
-                fetchWeights(user.uid);
-            }
-        });
-        return () => unsubscribe();
+        fetchWeights(userId);
     }, [])
 
     const fetchWeights = async (uid) => {

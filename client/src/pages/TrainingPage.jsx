@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
 import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, updateDoc, increment, query, where } from "firebase/firestore";
-import { db, auth } from "../firebase_config"
-import { onAuthStateChanged } from "firebase/auth";
+import { db } from "../firebase_config"
 import { useUser } from '../UserContext';
 
 const TrainingPage = () => {
     const [oldWorkoutPlan, setWorkoutPlan] = useState([]);
     const [oldWorkout, setWorkout] = useState([]);
-    const [userId, setUserId] = useState(null);
 
     const [workoutPlanName, setWorkoutPlanName] = useState("");
     const [newExercise, setNewExercise] = useState("");
@@ -20,19 +18,13 @@ const TrainingPage = () => {
     
     const [oldWeight, setWeight] = useState([]); // fetch user weight for exp calc
 
-    const { exp } = useUser();
+    const { exp, userId } = useUser();
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setUserId(user.uid);
-                fetchWorkoutPlan(user.uid);
-                fetchWorkout(user.uid);
-                fetchExercises();
-                fetchWeights(user.uid);
-            }
-        });
-        return () => unsubscribe();
+        fetchWorkoutPlan(userId);
+        fetchWorkout(userId);
+        fetchExercises();
+        fetchWeights(userId);
     }, [])
 
     useEffect(() => {
@@ -206,12 +198,12 @@ const TrainingPage = () => {
         e.preventDefault();
         const time = new Date();
         const userWeight = oldWeight[oldWeight.length-1]?.value ?? 100; // use 100kg to calculate exp if weight not logged
-        const expNew = workoutForLogging.map(ex => Number(Math.round(ex.weight / userWeight * ex.sets * ex.reps))).reduce((a, b) => a + b, 0);
+        const expInc = workoutForLogging.map(ex => Number(Math.round(ex.weight / userWeight * ex.sets * ex.reps))).reduce((a, b) => a + b, 0);
         const entry = {
                 workout: workoutPlanForLogging, 
                 exercises: workoutForLogging,
                 time: time,
-                exp: expNew
+                exp: expInc
         };
             
         console.log("submitting entry:", entry);
@@ -231,7 +223,7 @@ const TrainingPage = () => {
 
         try {
             await updateDoc(doc(db, "Users", userId), { 
-                exp: increment(exp)
+                exp: increment(expInc)
             });
             console.log("User EXP updated");
         } catch (err) {

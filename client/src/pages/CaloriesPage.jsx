@@ -2,22 +2,16 @@ import AddFood from "../components/AddFood";
 import { formatDateToYYYYMMDD } from "../helper";
 import { useState, useEffect } from "react";
 import { getDoc, doc, } from "firebase/firestore";
-import { db, auth } from "../firebase_config"
-import { onAuthStateChanged } from "firebase/auth";
+import { db } from "../firebase_config"
+import { useUser } from "../UserContext";
 
 const CaloriesPage = () => {
     const [totalCalories, setTotalCalories] = useState(0);
-    const [userId, setUserId] = useState(null);
-    const [curDate, setCurDate] = useState(new Date())
+    const [curDate, setCurDate] = useState(new Date());
+    const { userId } = useUser();
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setUserId(user.uid);
-                fetchCalories(user.uid);
-            }
-        });
-        return () => unsubscribe();
+        fetchCalories(userId)
     }, [curDate])
 
     const fetchCalories = async (uid) => {

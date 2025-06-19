@@ -10,6 +10,7 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [exp, setExp] = useState(0);
   const [userId, setUserId] = useState(null);
+  const [dailyCaloriesGoal, setDailyCaloriesGoal] = useState(0);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -33,6 +34,7 @@ export const UserProvider = ({ children }) => {
       if (docSnap.exists()) {
         const userData = docSnap.data();
         setExp(userData.exp || 0);
+        setDailyCaloriesGoal(userData.Daily_Calories || 0);
       } else {
         setExp(0);
       }
@@ -42,7 +44,7 @@ export const UserProvider = ({ children }) => {
   }, [userId]);
 
   return (
-    <UserContext.Provider value={{ user, exp, userId }}>
+    <UserContext.Provider value={{ user, exp, userId, dailyCaloriesGoal }}>
       {children}
     </UserContext.Provider>
   );
