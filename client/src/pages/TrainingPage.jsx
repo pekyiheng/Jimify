@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, updateDoc, increment, query, where } from "firebase/firestore";
 import { db, auth } from "../firebase_config"
 import { onAuthStateChanged } from "firebase/auth";
+import { useUser } from '../UserContext';
 
 const TrainingPage = () => {
     const [oldWorkoutPlan, setWorkoutPlan] = useState([]);
@@ -16,9 +17,10 @@ const TrainingPage = () => {
     const [showWorkoutForm, setShowWorkoutForm] = useState(false);
     const [workoutPlanForLogging, setWorkoutPlanForLogging] = useState("");
     const [workoutForLogging, setWorkoutForLogging] = useState([]);
-
+    
     const [oldWeight, setWeight] = useState([]); // fetch user weight for exp calc
 
+    const { exp } = useUser();
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -204,37 +206,37 @@ const TrainingPage = () => {
         e.preventDefault();
         const time = new Date();
         const userWeight = oldWeight[oldWeight.length-1]?.value ?? 100; // use 100kg to calculate exp if weight not logged
-        const exp = workoutForLogging.map(ex => Number(Math.round(ex.weight / userWeight * ex.sets * ex.reps))).reduce((a, b) => a + b, 0);
+        const expNew = workoutForLogging.map(ex => Number(Math.round(ex.weight / userWeight * ex.sets * ex.reps))).reduce((a, b) => a + b, 0);
         const entry = {
                 workout: workoutPlanForLogging, 
                 exercises: workoutForLogging,
                 time: time,
-                exp: exp
+                exp: expNew
         };
             
-            console.log("submitting entry:", entry);
+        console.log("submitting entry:", entry);
 
-            try {
-                const docId = Date.now().toString();
-                const userWorkoutDocRef = doc(db, "Users", userId, "User_Workout", docId);
-                const docRef = await setDoc(userWorkoutDocRef, entry);
-                console.log("Successfully added to Firestore:", docId);
-                setWorkout([...oldWorkout, { ...entry, id: docId }]);
-                setWorkoutForLogging([]);
-                setWorkoutPlanForLogging("");
-                setShowWorkoutForm(false);
-            } catch (err) {
-                console.error("Error adding workout:", err);
-            }
+        try {
+            const docId = Date.now().toString();
+            const userWorkoutDocRef = doc(db, "Users", userId, "User_Workout", docId);
+            const docRef = await setDoc(userWorkoutDocRef, entry);
+            console.log("Successfully added to Firestore:", docId);
+            setWorkout([...oldWorkout, { ...entry, id: docId }]);
+            setWorkoutForLogging([]);
+            setWorkoutPlanForLogging("");
+            setShowWorkoutForm(false);
+        } catch (err) {
+            console.error("Error adding workout:", err);
+        }
 
-            try {
-                await updateDoc(doc(db, "Users", userId), { 
-                    exp: increment(exp)
-                });
-                console.log("User EXP updated");
-            } catch (err) {
-                console.error("Error updating EXP:", err);
-            }
+        try {
+            await updateDoc(doc(db, "Users", userId), { 
+                exp: increment(exp)
+            });
+            console.log("User EXP updated");
+        } catch (err) {
+            console.error("Error updating EXP:", err);
+        }
     }
 
 

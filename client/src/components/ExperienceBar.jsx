@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, query, where } from "firebase/firestore";
 import { db, auth } from "../firebase_config"
 import { onAuthStateChanged } from "firebase/auth";
-
+import { useUser } from '../UserContext';
 
 const ExperienceBar = () => {
     
-    const [exp, setExp] = useState(0);
+    const { exp } = useUser();
     const level = Math.floor(exp / 100);
 
+    /*
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -30,6 +31,7 @@ const ExperienceBar = () => {
             console.error(e);
         }
     }
+    */
     
     return (
         <div>
