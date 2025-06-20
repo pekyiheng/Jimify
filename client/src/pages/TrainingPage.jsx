@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, updateDoc, increment, query, where } from "firebase/firestore";
 import { db } from "../firebase_config"
 import { useUser } from '../UserContext';
+import { IoMdReturnLeft } from "react-icons/io";
+import { useNavigate } from 'react-router-dom';
 
 const TrainingPage = () => {
     const [oldWorkoutPlan, setWorkoutPlan] = useState([]);
@@ -19,6 +21,7 @@ const TrainingPage = () => {
     const [oldWeight, setWeight] = useState([]); // fetch user weight for exp calc
 
     const { exp, userId } = useUser();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchWorkoutPlan(userId);
@@ -142,6 +145,31 @@ const TrainingPage = () => {
     
     const handleNewWorkoutPlan = async (e) => {
         e.preventDefault();
+
+        const duplicateName = oldWorkoutPlan.some(plan => plan.workoutName.toLowerCase().trim() === workoutPlanName.toLowerCase().trim());
+        if (duplicateName) {
+            alert("Please choose different workout name");
+            return;
+        }
+        
+        const hasNaN = selectedExercises.some(ex => isNaN(ex.weight) || isNaN(ex.sets) || isNaN(ex.reps) || isNaN(ex.restMinutes) || isNaN(ex.restSeconds));
+        if (hasNaN) {
+            alert("All inputs must be numbers");
+            return;
+        }
+
+        const hasInvalidExercise = selectedExercises.some(ex => ex.weight <= 0 || ex.sets <= 0 || ex.reps <= 0);
+        if (hasInvalidExercise) {
+            alert("All exercises must have weight, sets, and reps > 0");
+            return;
+        }
+
+        const hasInvalidRestTime = selectedExercises.some(ex => ex.restMinutes < 0 || ex.restSeconds < 0 || ex.restSeconds > 59);
+        if (hasInvalidRestTime) {
+            alert("All exercises must have valid rest time");
+            return;
+        }
+
         const time = new Date();
         const entry = {
             workoutName: workoutPlanName,
@@ -165,6 +193,21 @@ const TrainingPage = () => {
         }
     }
 
+    const handleStartWorkout = (id) => {
+        const selectedPlan = oldWorkoutPlan.find(plan => plan.id === id);
+        if (!selectedPlan) {
+            alert("Workout plan not found");
+            return;
+        }
+
+        navigate("/workoutStartPage", {
+            state: {
+                workoutName: selectedPlan.workoutName,
+                exercises: selectedPlan.exercises,
+            }
+        })
+    }
+
     const handleDeleteWorkoutPlan = async (id) => {
         try {
             await deleteDoc(doc(db, "Users", userId, "User_Workout_Plan", id));
@@ -177,18 +220,19 @@ const TrainingPage = () => {
 
     const handleNewExercise = () => {
         if (!selectedExercises.some(ex => ex.exercise == newExercise)) { // no duplicate exercises in array
-            setSelectedExercises([...selectedExercises, {exercise: newExercise, weight: 60, sets: 3, reps: 10}]);
+            setSelectedExercises([...selectedExercises, {exercise: newExercise, weight: 60, sets: 3, reps: 10, restMinutes: 3, restSeconds: 0}]);
             setNewExercise(exerciseOptions.length > 0 ? exerciseOptions[0].exercise : "");
         } else {
             console.error("Error adding exercise");
         }
     }
 
-    function WorkoutPlan({ name, exercise, onDelete }) {
+    function WorkoutPlan({ name, exercise, startWorkout, onDelete }) {
         return (
             <div>
                 <h3>{name}</h3>
                 {exercise}
+                <button onClick={startWorkout} className="button">Start Workout</button>
                 <button onClick={onDelete} className="button">Delete</button>
             </div>
         );
@@ -236,7 +280,6 @@ const TrainingPage = () => {
             console.error("Error updating EXP:", err);
         }
     }
-
 
     const handleDeleteWorkout = async (id) => {
         
@@ -333,6 +376,20 @@ const TrainingPage = () => {
                                                     updatedExercises[index].reps = parseInt(e.target.value);
                                                     setSelectedExercises(updatedExercises);
                                                 }}/>
+                                                <br />
+                                                <label>Rest time between sets: </label> 
+                                                <input type="number" value={ex.restMinutes} onChange={(e) => {
+                                                    const updatedExercises = [...selectedExercises];
+                                                    updatedExercises[index].restMinutes = parseInt(e.target.value);
+                                                    setSelectedExercises(updatedExercises);
+                                                }}/>
+                                                min
+                                                <input type="number" value={ex.restSeconds} onChange={(e) => {
+                                                    const updatedExercises = [...selectedExercises];
+                                                    updatedExercises[index].restSeconds = parseInt(e.target.value);
+                                                    setSelectedExercises(updatedExercises);
+                                                }}/>
+                                                s
                                             </div>
                                             <button onClick={() => setSelectedExercises(selectedExercises.filter((_, i) => i !== index))} className="button">Remove Exercise</button>
                                         </div>
@@ -356,10 +413,13 @@ const TrainingPage = () => {
                                 exercise={
                                     <ul>
                                         {entry.exercises.map((e, index) => (
-                                            <li key={index}>{e.exercise} ({e.weight}KG) - {e.sets} sets x {e.reps} reps</li>
+                                            <li key={index}>{e.exercise} ({e.weight}KG) - {e.sets} sets x {e.reps} reps
+                                            <br/>
+                                            Rest between sets: {e.restMinutes} min {String(e.restSeconds).padStart(2, "0")} s</li>
                                         ))}
                                     </ul>
                                 }
+                                startWorkout={() => handleStartWorkout(entry.id)}
                                 onDelete={() => handleDeleteWorkoutPlan(entry.id)}/></li>))}
                 </ul>
             </div>
