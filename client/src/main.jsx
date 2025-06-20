@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import './index.css'
 import App from './App.jsx'
+import OnboardUser from './pages/OnboardUserPage.jsx';
 import CaloriesPage from './pages/CaloriesPage';
 import WeightPage from './pages/WeightPage';
 import NutritionPage from './pages/NutritionPage';
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
     children: [
       { path: "loginPage", element: <LoginPage /> },
       { path: "registerPage", element: <RegisterPage /> },
+      { path: "onboardUserPage", element: <OnboardUser />},
       { path: "*", element: <DoesNotExistPage />},
     ]
   },

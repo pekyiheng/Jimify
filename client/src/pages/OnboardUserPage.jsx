@@ -4,7 +4,7 @@ import { getDoc, setDoc, doc, } from "firebase/firestore";
 import { useUser } from "../UserContext";
 import { calculateBMR, getGoal, getActivityLevel } from '../helper';
 
-const CustomizeUser = () => {
+const OnboardUser = () => {
 
     const { userId } = useUser();
     const [showDialog, setShowDialog] = useState(false);
@@ -19,7 +19,7 @@ const CustomizeUser = () => {
     const [goal, setGoal] = useState('maintain');
 
     useEffect(() => {
-        fetchUserProfile(userId);
+        //fetchUserProfile(userId);
     }, []);
 
     const fetchUserProfile = async (uid) => {
@@ -44,18 +44,6 @@ const CustomizeUser = () => {
         }
     }
 
-    const toggleDialog = () => {
-        setShowDialog(!showDialog);
-    };
-
-    useEffect(() => {
-        if (showDialog) {
-            dialogRef.current.showModal();
-        } else {
-            dialogRef.current.close();
-        }
-    }, [showDialog]);
-
     const handleSubmit = (e) => {
         e.preventDefault();
         const age = new Date().getFullYear() - new Date(birthdate).getFullYear();
@@ -76,6 +64,18 @@ const CustomizeUser = () => {
 
     }
 
+    return (
+        <>
+             <header className='registerHeader'>
+                <h2>Welcome to Jimify! Let's set up yout profile </h2>
+            </header>
+            <div>
+                
+            </div>
+        </>
+    )
+
+    /*
     return (
         <>
             <button onClick={toggleDialog}>Edit profile</button>
@@ -129,6 +129,7 @@ const CustomizeUser = () => {
             </dialog>
         </>
     )
+    */
 }
 
-export default CustomizeUser;
+export default OnboardUser;

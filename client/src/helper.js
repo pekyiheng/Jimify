@@ -10,4 +10,44 @@ function formatDateToYYYYMMDD(date) {
     return `${year}-${month}-${day}`;
 }
 
-export { formatDateToYYYYMMDD };
+function calculateBMR(gender, weight, height, age, activityFactor) {
+  var genderFactor = 0;
+  if (gender == 'M') {
+       genderFactor = 5;
+  } else {
+      genderFactor = -161;
+  }
+  return (10 * weight + 6.25 * height - 5 * age + genderFactor) * activityFactor;
+}
+
+function getGoal(goal) {
+  switch (goal) {
+      case 'gain fast':
+          return 500;
+      case 'gain slow':
+          return 200;
+      case 'lose slow':
+          return (-200);
+      case 'lose fast':
+          return (-500);
+      default:
+          return 0; //maintain
+  }
+}
+
+function getActivityLevel(activity) {
+  switch (activity) {
+      case 'light':
+          return (1.375);
+      case 'moderate':
+          return(1.55);
+      case 'active':
+          return (1.725);
+      case 'very active':
+          return(1.9);
+      default:
+          return (1.2); //sedentary
+  }
+}
+
+export { formatDateToYYYYMMDD, calculateBMR, getGoal, getActivityLevel };
