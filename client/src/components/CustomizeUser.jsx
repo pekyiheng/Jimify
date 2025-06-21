@@ -18,10 +18,6 @@ const CustomizeUser = () => {
     const [activityLevel, setActivityLevel] = useState('sedentary');
     const [goal, setGoal] = useState('maintain');
 
-    useEffect(() => {
-        fetchUserProfile(userId);
-    }, []);
-
     const fetchUserProfile = async (uid) => {
         const userProfileDocRef = doc(db, "Users", uid);
         try {
@@ -31,12 +27,9 @@ const CustomizeUser = () => {
                 docSnap.data().Gender && setGender(docSnap.data().Gender);
                 docSnap.data().Birthdate && setBirthdate(docSnap.data().Birthdate);
                 docSnap.data().Height && setHeight(docSnap.data().Height);
-                docSnap.data().Weight && setWeight(docSnap.data().Weight);
                 docSnap.data().Goal && setGoal(docSnap.data().Goal);
                 docSnap.data().Activity_Level && setActivityLevel(docSnap.data().Activity_Level);
                 docSnap.data().Daily_Calories && setDailyCalories(docSnap.data().Daily_Calories);
-            } else {
-                setShowDialog(true);
             }
             
         } catch (e) {
@@ -50,6 +43,7 @@ const CustomizeUser = () => {
 
     useEffect(() => {
         if (showDialog) {
+            fetchUserProfile(userId);
             dialogRef.current.showModal();
         } else {
             dialogRef.current.close();
@@ -81,7 +75,7 @@ const CustomizeUser = () => {
             <button onClick={toggleDialog}>Edit profile</button>
             <dialog ref={dialogRef}>
                 <header className='registerHeader'>
-                    <h2>Welcome to Jimify! Let's set up yout profile </h2>
+                    <h2>Edit profile </h2>
                 </header>
                 <div>
                     <form onSubmit={handleSubmit}>
@@ -100,9 +94,6 @@ const CustomizeUser = () => {
                         <label htmlFor='heightField' >What is your height?</label>
                         <input required id='heightField' type='number' value={height} onChange={e => setHeight(e.target.value)} ></input>
                         <br></br>
-                        <label htmlFor='initialWeightField' >What is your current weight?</label>
-                        <input required id='initialWeightField' type='number' value={weight} onChange={e => setWeight(e.target.value)} ></input>
-                        <br></br>
                         <label htmlFor='goalField' >What is your goal?</label>
                         <select required id="goalField" name="goalField" value={goal} onChange={(e) => setGoal(e.target.value)}>
                             <option value="gain fast">Gain weight (fast)</option>
@@ -120,6 +111,7 @@ const CustomizeUser = () => {
                             <option value="active">Active</option>
                             <option value="very active">Very active</option>
                         </select>
+                        <h4>Current weight: {weight}</h4>
 
                         <input type='submit'></input>
                     </form>

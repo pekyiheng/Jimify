@@ -2,107 +2,111 @@ import { useState, useEffect, useRef } from 'react';
 import { db } from "../firebase_config"
 import { getDoc, setDoc, doc, } from "firebase/firestore";
 import { useUser } from "../UserContext";
-import { calculateBMR, getGoal, getActivityLevel } from '../helper';
+import { formatDateToYYYYMMDD, calculateBMR, getGoal, getActivityLevel } from '../helper';
 
-const OnboardUser = () => {
+const OnboardUser = ({setToOnboard}) => {
 
     const { userId } = useUser();
-    const [showDialog, setShowDialog] = useState(false);
-    const dialogRef = useRef(null);
+    const [step, setStep] = useState(0);
+    const [invalid, setInvalid] = useState(false);
     const [username, setUsername] = useState('');
     const [dailyCalories, setDailyCalories] = useState(0);
     const [weight, setWeight] = useState(0);
     const [height, setHeight] = useState(0);
-    const [birthdate, setBirthdate] = useState(0);
+    const [birthdate, setBirthdate] = useState(new Date());
     const [gender, setGender] = useState('M');
     const [activityLevel, setActivityLevel] = useState('sedentary');
     const [goal, setGoal] = useState('maintain');
 
-    useEffect(() => {
-        //fetchUserProfile(userId);
-    }, []);
-
-    const fetchUserProfile = async (uid) => {
-        const userProfileDocRef = doc(db, "Users", uid);
-        try {
-            const docSnap = await getDoc(userProfileDocRef);
-            if (docSnap.exists() && docSnap.data().Username) {
-                setUsername(docSnap.data().Username);
-                docSnap.data().Gender && setGender(docSnap.data().Gender);
-                docSnap.data().Birthdate && setBirthdate(docSnap.data().Birthdate);
-                docSnap.data().Height && setHeight(docSnap.data().Height);
-                docSnap.data().Weight && setWeight(docSnap.data().Weight);
-                docSnap.data().Goal && setGoal(docSnap.data().Goal);
-                docSnap.data().Activity_Level && setActivityLevel(docSnap.data().Activity_Level);
-                docSnap.data().Daily_Calories && setDailyCalories(docSnap.data().Daily_Calories);
-            } else {
-                setShowDialog(true);
-            }
-            
-        } catch (e) {
-            console.error("Error fetching food list:", e);
-        }
-    }
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const age = new Date().getFullYear() - new Date(birthdate).getFullYear();
         console.log(age);
         const dailyGoal = Math.round(calculateBMR(gender, weight, height, age, getActivityLevel(activityLevel)) + getGoal(goal));
         setDailyCalories(dailyGoal);
         const userProfileDocRef = doc(db, "Users", userId);
-        setDoc(userProfileDocRef, {
-            Username: username,
-            Daily_Calories: dailyGoal,
-            Weight: weight,
-            Height: height,
-            Birthdate: birthdate,
-            Gender: gender,
-            Activity_Level: activityLevel,
-            Goal: goal,
-        }, {merge: true});
-
+        try {
+            const docRef = await setDoc(userProfileDocRef, {
+                Username: username,
+                Daily_Calories: dailyGoal,
+                Weight: weight,
+                Height: height,
+                Birthdate: birthdate,
+                Gender: gender,
+                Activity_Level: activityLevel,
+                Goal: goal,
+            }, {merge: true});
+            setStep(step + 1);
+        } catch (err) {
+            console.error("Error adding user profile:", err);
+        }
     }
 
-    return (
-        <>
-             <header className='registerHeader'>
-                <h2>Welcome to Jimify! Let's set up yout profile </h2>
-            </header>
-            <div>
-                
-            </div>
-        </>
-    )
+    const preventSubmit = (e) => {
+        e.preventDefault();
+    }
 
-    /*
-    return (
-        <>
-            <button onClick={toggleDialog}>Edit profile</button>
-            <dialog ref={dialogRef}>
-                <header className='registerHeader'>
-                    <h2>Welcome to Jimify! Let's set up yout profile </h2>
-                </header>
-                <div>
-                    <form onSubmit={handleSubmit}>
+    const backToHome = () => {
+        setToOnboard(false);
+    }
+
+    const steps = [
+        {
+            id: 0,
+            content: <div className='registerHeader'>
+                        <h2>Welcome to Jimify! Let's set up yout profile </h2>
+                    </div>
+        },
+        {
+          id: 1,
+          content: <form onSubmit={preventSubmit}>
                         <label htmlFor='usernameField' >Username</label>
-                        <input required id='usernameField' type='text' value={username} onChange={e => setUsername(e.target.value)}></input>
                         <br></br>
+                        <input required id='usernameField' type='text' value={username} onChange={e => setUsername(e.target.value)}></input>
+                        {invalid && <p className='invalidFields'>Please enter a username</p>}
+                    </form>, 
+        },
+        {
+          id: 2,
+          content: <form onSubmit={preventSubmit}>
                         <label htmlFor='genderField' >What is your gender?</label>
+                        <br></br>
                         <select required id='genderField' value={gender} onChange={e => setGender(e.target.value)} >
                             <option value='M' >Male</option>
                             <option value='F' >Female</option>
                         </select>
-                        <br></br>
+                    </form>
+        },
+        {
+          id: 3,
+          content: <form onSubmit={preventSubmit}>
                         <label htmlFor='birthdateField' >What is your birthdate?</label>
+                        <br></br>
                         <input required id='birthdateField' type='date' value={birthdate} onChange={e => setBirthdate(e.target.value)} ></input>
-                        <br></br>
+                        {invalid && <p className='invalidFields'>Please enter a valid date</p>}
+                    </form>
+        },
+        {
+          id: 4,
+          content: <form onSubmit={preventSubmit}>
                         <label htmlFor='heightField' >What is your height?</label>
-                        <input required id='heightField' type='number' value={height} onChange={e => setHeight(e.target.value)} ></input>
                         <br></br>
+                        <input required id='heightField' type='number' value={height} onChange={e => setHeight(parseInt(e.target.value))} ></input>
+                        {invalid && <p className='invalidFields'>Please enter a valid height</p>}
+                    </form>
+        },
+        {
+            id: 5,
+          content: <form onSubmit={preventSubmit}>
                         <label htmlFor='initialWeightField' >What is your current weight?</label>
-                        <input required id='initialWeightField' type='number' value={weight} onChange={e => setWeight(e.target.value)} ></input>
                         <br></br>
+                        <input required id='initialWeightField' type='number' value={weight} onChange={e => setWeight(parseInt(e.target.value))} ></input>
+                        {invalid && <p className='invalidFields'>Please enter a valid weight</p>}
+                    </form>
+        }, 
+        {
+            id: 6,
+          content: <form onSubmit={preventSubmit}>
                         <label htmlFor='goalField' >What is your goal?</label>
                         <select required id="goalField" name="goalField" value={goal} onChange={(e) => setGoal(e.target.value)}>
                             <option value="gain fast">Gain weight (fast)</option>
@@ -112,24 +116,80 @@ const OnboardUser = () => {
                             <option value="lose fast">Lose weight (fast 0.5kg/week)</option>
                         </select>
                         <br></br>
+                    </form>
+        },
+        {
+            id: 7,
+          content: <form onSubmit={preventSubmit}>
                         <label htmlFor='activityField' >How active are you??</label>
-                        <select required id="activityField" name="activityField" value={activityLevel} onChange={(e) => setActivityLevel(e.target.value)} >
-                            <option value="sedentary">Sedentary</option>
+                        <select required id="activityField" name="activityField" value={activityLevel} onChange={(e) => setActivityLevel(e.target.value)}>
+                        <option value="sedentary">Sedentary</option>
                             <option value="light">Lightly active</option>
                             <option value="moderate">Moderately active</option>
                             <option value="active">Active</option>
                             <option value="very active">Very active</option>
                         </select>
-
-                        <input type='submit'></input>
                     </form>
-                    <p>Daily calories goal: {dailyCalories}</p>
-                </div>
-                <button onClick={toggleDialog}>Close</button>
-            </dialog>
+        },
+        {
+            id: 8,
+          content: <div>
+            <p>Daily calories goal: {dailyCalories}</p>
+            <button onClick={backToHome}>Return</button>
+            </div>
+        }
+            
+      ];
+
+      const handleNext = (e) => {
+        console.log(e.target.value);
+        if (step > steps.length) {
+            return;
+        }
+        if (step > 0 && username == "") {
+            setInvalid(true);
+            return;
+        }
+
+        if (step == 3 && (birthdate == ''|| birthdate == null || new Date() < new Date(birthdate))) {
+            setInvalid(true);
+            return
+        }
+
+        if (step == 4 && (height == null || height <= 0)) {
+            setInvalid(true);
+            return
+        }
+
+        if (step == 5 && (weight == null || weight <= 0)) {
+            setInvalid(true);
+            return
+        }
+
+        setInvalid(false);
+        setStep(step + 1);
+      };
+    
+
+    return (
+        <>
+            <div>
+                {steps[step].content}
+            </div>
+            <div>
+                {step > 0 && (
+                    <button onClick={() => setStep(step - 1)}>Back</button>
+                )}
+                {step < steps.length - 2 && (
+                    <button onClick={handleNext}>Next</button>
+                )}
+                {step == steps.length - 2 && (
+                    <button onClick={handleSubmit}>Submit</button>
+                )}
+                
+            </div>
         </>
     )
-    */
 }
 
 export default OnboardUser;
