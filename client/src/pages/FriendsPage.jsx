@@ -17,8 +17,8 @@ const FriendsPage = () => {
         fetchOutgoingRequests(userId);
     }, [])
 
-    const fetchFriends = async () => {
-        const userDocRef = doc(db, "Users", userId);
+    const fetchFriends = async (uid) => {
+        const userDocRef = doc(db, "Users", uid);
         
         try {
             const docSnap = await getDoc(userDocRef);
@@ -30,9 +30,9 @@ const FriendsPage = () => {
         }
     }
 
-    const fetchOutgoingRequests = async () => {
+    const fetchOutgoingRequests = async (uid) => {
         try {
-            const q = query(collection(db, "FriendRequests"), where("fromUserId", "==", userId), where("status", "==", "pending"));
+            const q = query(collection(db, "FriendRequests"), where("fromUserId", "==", uid), where("status", "==", "pending"));
             const docSnap = await getDocs(q);
             const data = docSnap.docs.map((docSnap) => {
                 const docData = docSnap.data();
@@ -48,9 +48,9 @@ const FriendsPage = () => {
         }
     }
 
-    const fetchIncomingRequests = async () => {
+    const fetchIncomingRequests = async (uid) => {
         try {
-            const q = query(collection(db, "FriendRequests"), where("toUserId", "==", userId), where("status", "==", "pending"));
+            const q = query(collection(db, "FriendRequests"), where("toUserId", "==", uid), where("status", "==", "pending"));
             const docSnap = await getDocs(q);
             const data = docSnap.docs.map((docSnap) => {
                 const docData = docSnap.data();
@@ -72,15 +72,15 @@ const FriendsPage = () => {
             const updatedIncomingRequests = incomingRequests.filter((entry) => entry.id !== id);
             setIncomingRequests(updatedIncomingRequests);
 
-            await updateDoc(doc(db, "User", userId), {
+            await setDoc(doc(db, "Users", userId), {
                 friends: arrayUnion(fromUserId),
-            });
+            }, { merge: true });
 
             await updateDoc(doc(db, "Users", fromUserId), {
                 friends: arrayUnion(userId),
-            });
+            }, { merge: true });
 
-            fetchFriends();
+            fetchFriends(userId);
 
         } catch (err) {
             console.error("Error accepting request:", err);
@@ -153,7 +153,7 @@ const FriendsPage = () => {
         <div>
             <h2>Friends:</h2>
             <ul> {friends.map((entry, index) => 
-                (<li>{entry}</li>))}</ul>
+                (<li key={entry}>{entry}</li>))}</ul>
             <h2>Incoming Requests:</h2>
             <ul> {incomingRequests.map((entry, index) => 
                 (<li key={entry.id}><IncomingRequest fromUserId={entry.fromUserId} onAccept={() => handleAccept(entry.id, entry.fromUserId)} onReject={() => handleReject(entry.id)}/></li>))}</ul>
