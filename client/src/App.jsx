@@ -1,25 +1,58 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { Outlet, Navigate } from 'react-router-dom'
+import { getDoc, setDoc, doc, } from "firebase/firestore";
 import NavBar from './components/NavBar'
 import Header from './components/Header'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { auth } from './firebase_config';
+import { onAuthStateChanged } from 'firebase/auth'
+import { auth, db } from './firebase_config';
+import { useUser } from './UserContext'
 import ExperienceBar from './components/ExperienceBar'
-//import { useAuth } from './AuthContext'
+import OnboardUser from './pages/OnboardUserPage'
+
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
+  const [toOnboard, setToOnboard] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoadingAuth(false);
+      if (currentUser) {
+        fetchUserProfile(currentUser.uid);
+      } else {
+        console.log("no user")
+        setUserId(null);
+        setToOnboard(false);
+        setLoadingAuth(false);
+      }
     });
-
     return () => unsubscribe();
   }, []); 
+
+  const fetchUserProfile = async (uid) => {
+    const userDocRef = doc(db, 'Users', uid);
+    
+    try {
+      console.log("fetching user..." + uid)
+      const docSnap = await getDoc(userDocRef);
+      setUserId(uid);
+      setLoadingAuth(false);
+      if (docSnap.exists() && docSnap.data().Username) {
+        console.log("Username: " + docSnap.data().Username)
+        setToOnboard(false);
+        return;
+      } else {
+        console.log("navigating to...");
+        setToOnboard(true);
+        return;
+      }
+    } catch (err) {
+      console.log("error " + docSnap);
+      setToOnboard(true);
+      return;
+    }
+  };
 
   if (loadingAuth) {
     return (
@@ -29,16 +62,28 @@ function App() {
     );
   }
   
-  if (user) {
+  if (userId != null) {
+    console.log(toOnboard);
+    if (toOnboard) {
+      return (
+        <div className='app'>
+          <Header />
+          <OnboardUser setToOnboard={setToOnboard} />
+        </div>
+        
+      )
 
-    return (
-      <div className='app'>
-        <Header />
-        <Outlet />
-        <NavBar />
-        <ExperienceBar />
-      </div>
-    )
+    } else {
+      return (
+        <div className='app'>
+          <Header />
+          <Outlet />
+          <NavBar />
+          <ExperienceBar />
+        </div>
+      )
+    }
+
   } else {
     return <Navigate to="/loginPage" />
   }
