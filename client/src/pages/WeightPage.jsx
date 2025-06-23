@@ -71,7 +71,13 @@ const WeightPage = () => {
             try {
                 const docId = Date.now().toString();
                 const userWeightDocRef = doc(db, "Users", userId, "User_Weight", docId);
-                const docRef = await setDoc(userWeightDocRef, entry);
+                const userDocRef = doc(db, "Users", userId);
+                //updates weight in user document
+                await setDoc(userDocRef, {
+                    Weight: value,
+                }, { merge: true });
+                //updates weight in user weight collection
+                setDoc(userWeightDocRef, entry);
                 console.log("Successfully added to Firestore:", docId);
                 setWeight([...oldWeight, { ...entry, id: docId }]);
                 setNewWeight("");

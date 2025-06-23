@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { db } from "../firebase_config"
-import { getDoc, setDoc, doc, } from "firebase/firestore";
+import { getDoc, getDocs, collection, setDoc, doc, } from "firebase/firestore";
 import { useUser } from "../UserContext";
 import { calculateBMR, getGoal, getActivityLevel } from '../helper';
+import { formatDateToYYYYMMDD } from '../helper';
 
 const CustomizeUser = () => {
 
@@ -13,7 +14,7 @@ const CustomizeUser = () => {
     const [dailyCalories, setDailyCalories] = useState(0);
     const [weight, setWeight] = useState(0);
     const [height, setHeight] = useState(0);
-    const [birthdate, setBirthdate] = useState(0);
+    const [birthdate, setBirthdate] = useState(new Date());
     const [gender, setGender] = useState('M');
     const [activityLevel, setActivityLevel] = useState('sedentary');
     const [goal, setGoal] = useState('maintain');
@@ -25,15 +26,32 @@ const CustomizeUser = () => {
             if (docSnap.exists() && docSnap.data().Username) {
                 setUsername(docSnap.data().Username);
                 docSnap.data().Gender && setGender(docSnap.data().Gender);
-                docSnap.data().Birthdate && setBirthdate(docSnap.data().Birthdate);
+                docSnap.data().Birthdate && setBirthdate(formatDateToYYYYMMDD(docSnap.data().Birthdate.toDate()));
                 docSnap.data().Height && setHeight(docSnap.data().Height);
                 docSnap.data().Goal && setGoal(docSnap.data().Goal);
                 docSnap.data().Activity_Level && setActivityLevel(docSnap.data().Activity_Level);
                 docSnap.data().Daily_Calories && setDailyCalories(docSnap.data().Daily_Calories);
+                fetchWeight(uid);
             }
-            
+
         } catch (e) {
             console.error("Error fetching food list:", e);
+        }
+    }
+
+    const fetchWeight = async (uid) => {
+        const userWeightColRef = collection(db, "Users", uid, "User_Weight");
+        
+        try {
+            const docSnap = await getDocs(userWeightColRef);
+            const lastDoc = docSnap.docs[docSnap.docs.length - 1];
+            const data = lastDoc.data().value;
+            setWeight(data);
+
+        }
+        catch (e) {
+            console.error(e);
+            return null;
         }
     }
 
@@ -45,24 +63,30 @@ const CustomizeUser = () => {
         if (showDialog) {
             fetchUserProfile(userId);
             dialogRef.current.showModal();
+            console.log(birthdate)
         } else {
             dialogRef.current.close();
         }
     }, [showDialog]);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    useEffect(() => {
+        if (!birthdate) return;
         const age = new Date().getFullYear() - new Date(birthdate).getFullYear();
         console.log(age);
         const dailyGoal = Math.round(calculateBMR(gender, weight, height, age, getActivityLevel(activityLevel)) + getGoal(goal));
         setDailyCalories(dailyGoal);
+    }, [activityLevel, goal])
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
         const userProfileDocRef = doc(db, "Users", userId);
         setDoc(userProfileDocRef, {
             Username: username,
-            Daily_Calories: dailyGoal,
+            Daily_Calories: dailyCalories,
             Weight: weight,
             Height: height,
-            Birthdate: birthdate,
+            Birthdate: new Date(birthdate),
             Gender: gender,
             Activity_Level: activityLevel,
             Goal: goal,
@@ -111,13 +135,13 @@ const CustomizeUser = () => {
                             <option value="active">Active</option>
                             <option value="very active">Very active</option>
                         </select>
-                        <h4>Current weight: {weight}</h4>
-
-                        <input type='submit'></input>
+                        <h4>Current weight: {weight} kg</h4>
+                        <button onClick={toggleDialog}>Close</button>
+                        <input type='submit' value="Save" className='button' ></input>
                     </form>
                     <p>Daily calories goal: {dailyCalories}</p>
                 </div>
-                <button onClick={toggleDialog}>Close</button>
+                
             </dialog>
         </>
     )
