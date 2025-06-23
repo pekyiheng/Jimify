@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, updateDoc, increment, query, where, arrayUnion } from "firebase/firestore";
+import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, updateDoc, increment, query, where, arrayUnion, arrayRemove } from "firebase/firestore";
 import { db } from "../firebase_config"
 import { useUser } from '../UserContext';
 
@@ -10,6 +10,7 @@ const FriendsPage = () => {
     const [incomingRequests, setIncomingRequests] = useState([]);
     const [outgoingRequests, setOutgoingRequests] = useState([]);
     const [addFriend, setAddFriend] = useState("");
+    const [ownUsername, setOwnUsername] = useState("");
 
     useEffect(() => {
         fetchFriends(userId);
@@ -24,6 +25,7 @@ const FriendsPage = () => {
             const docSnap = await getDoc(userDocRef);
             const data = docSnap.data();
             setFriends(data?.friends || []);
+            setOwnUsername(data?.Username || "");
         } catch (e) {
             console.error(e);
             return null;
@@ -99,15 +101,26 @@ const FriendsPage = () => {
 
     const handleRequest = async () => {
 
-        const toUserId = addFriend;
-        if (toUserId === userId) {
+        const toUsername = addFriend;
+        if (toUsername === ownUsername) {
             alert("Please select another user");
             return;
         }
 
-        const existing = query(collection(db, "FriendRequests"), where("fromUserId", "==", userId), where("toUserId", "==", toUserId), where("status", "==", "pending"))
-        const exists = await getDocs(existing);
-        if (!exists.empty) {
+        let toUserId = null;
+        const toUserIdQuery = query(collection(db, "Users"), where("Username", "==", toUsername));
+        const toUserIdSnapshot = await getDocs(toUserIdQuery);
+        if (!toUserIdSnapshot.empty) {
+            const toUserDoc = toUserIdSnapshot.docs[0];
+            toUserId = toUserDoc.id;
+        } else {
+            alert("No user found with that username");
+            return;
+        }
+
+        const existingRequest = query(collection(db, "FriendRequests"), where("fromUserId", "==", userId), where("toUserId", "==", toUserId), where("status", "==", "pending"))
+        const requestExists = await getDocs(existingRequest);
+        if (!requestExists.empty) {
             alert("Friend request already sent");
             return;
         }
@@ -122,18 +135,74 @@ const FriendsPage = () => {
             const docId = Date.now().toString();
             const friendRequestDocRef = doc(db, "FriendRequests", docId);
             const docRef = await setDoc(friendRequestDocRef, entry);
-            console.log("Friend Request ent: ", docId);
+            console.log("Friend Request sent: ", docId);
             setAddFriend("");
-            fetchOutgoingRequests();
+            fetchOutgoingRequests(userId);
         } catch (err) {
-            console.error("Error sending Friend Request:", err);
+            console.error("Error sending Friend Request: ", err);
         }
     }
 
-    function IncomingRequest({ fromUserId, onAccept, onReject }) {
+    const handleRemoveFriend = async (friendUserId) => {
+        try {
+            await updateDoc(doc(db, "Users", userId), {
+                friends: arrayRemove(friendUserId)
+            });
+            await updateDoc(doc(db, "Users", friendUserId), {
+                friends: arrayRemove(userId)
+            });
+            setFriends(friends.filter(friend => friend !== friendUserId));
+        } catch (err) {
+            console.error("Error removing friend: ", err);
+        }
+    }
+
+    function Friends({ friendUserId, onRemove }) {
+        const [friendUsername, setFriendUsername] = useState("");
+
+        useEffect(() => {
+            const fetchFriendUsername = async () => {
+                try {
+                    const docSnap = await getDoc(doc(db, "Users", friendUserId));
+                    const data = docSnap.data();
+                    setFriendUsername(data?.Username || "Unknown");
+                } catch (e) {
+                    console.error(e);
+                    return null;
+                }  
+            }
+            fetchFriendUsername();
+        }, [friendUserId])
+
         return (
             <>
-                <p>{fromUserId}</p>
+                <p>{friendUsername}</p>
+                <button className="button" onClick={onRemove}>Remove friend</button>
+            </>
+        )
+    }
+
+    function IncomingRequest({ fromUserId, onAccept, onReject }) {
+
+        const [fromUsername, setFromUsername] = useState("");
+
+        useEffect(() => {
+            const fetchFromUsername = async () => {
+                try {
+                    const docSnap = await getDoc(doc(db, "Users", fromUserId));
+                    const data = docSnap.data();
+                    setFromUsername(data?.Username || "Unknown");
+                } catch (e) {
+                    console.error(e);
+                    return null;
+                }  
+            }
+            fetchFromUsername();
+        }, [fromUserId])
+
+        return (
+            <>
+                <p>{fromUsername}</p>
                 <button className="button" onClick={onAccept}>Accept</button>
                 <button className="button" onClick={onReject}>Reject</button>
             </>
@@ -141,9 +210,25 @@ const FriendsPage = () => {
     }
 
     function OutgoingRequest({ toUserId }) {
+        const [toUsername, setToUsername] = useState("");
+
+        useEffect(() => {
+            const fetchToUsername = async () => {
+                try {
+                    const docSnap = await getDoc(doc(db, "Users", toUserId));
+                    const data = docSnap.data();
+                    setToUsername(data?.Username || "Unknown");
+                } catch (e) {
+                    console.error(e);
+                    return null;
+                }  
+            }
+            fetchToUsername();
+        }, [toUserId])
+        
         return (
             <>
-                <p>{toUserId}</p>
+                <p>{toUsername}</p>
                 <p>Status: PENDING</p>
             </>
         );
@@ -153,7 +238,7 @@ const FriendsPage = () => {
         <div>
             <h2>Friends:</h2>
             <ul> {friends.map((entry, index) => 
-                (<li key={entry}>{entry}</li>))}</ul>
+                (<li key={entry}><Friends friendUserId={entry} onRemove={() => handleRemoveFriend(entry)} /></li>))}</ul>
             <h2>Incoming Requests:</h2>
             <ul> {incomingRequests.map((entry, index) => 
                 (<li key={entry.id}><IncomingRequest fromUserId={entry.fromUserId} onAccept={() => handleAccept(entry.id, entry.fromUserId)} onReject={() => handleReject(entry.id)}/></li>))}</ul>
@@ -162,7 +247,7 @@ const FriendsPage = () => {
                 (<li key={entry.id}><OutgoingRequest toUserId={entry.toUserId}/></li>))}</ul>
 
             <label>Add Friend: </label>
-            <input type="text" value={addFriend} onChange={(e) => setAddFriend(e.target.value)} placeholder="user ID"></input>
+            <input type="text" value={addFriend} onChange={(e) => setAddFriend(e.target.value)} placeholder="username"></input>
             <button className="button" onClick={handleRequest} disabled={!addFriend}>Send Friend Request</button>
         </div>
     )
