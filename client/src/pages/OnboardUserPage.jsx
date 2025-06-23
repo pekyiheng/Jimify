@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { db } from "../firebase_config"
-import { getDoc, setDoc, doc, } from "firebase/firestore";
+import { getDocs, getDoc, setDoc, doc, query, collection, where } from "firebase/firestore";
 import { useUser } from "../UserContext";
 import { formatDateToYYYYMMDD, calculateBMR, getGoal, getActivityLevel } from '../helper';
 
@@ -9,11 +9,12 @@ const OnboardUser = ({setToOnboard}) => {
     const { userId } = useUser();
     const [step, setStep] = useState(0);
     const [invalid, setInvalid] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const [username, setUsername] = useState('');
     const [dailyCalories, setDailyCalories] = useState(0);
     const [weight, setWeight] = useState(0);
     const [height, setHeight] = useState(0);
-    const [birthdate, setBirthdate] = useState(new Date());
+    const [birthdate, setBirthdate] = useState(formatDateToYYYYMMDD(new Date()));
     const [gender, setGender] = useState('M');
     const [activityLevel, setActivityLevel] = useState('sedentary');
     const [goal, setGoal] = useState('maintain');
@@ -29,17 +30,25 @@ const OnboardUser = ({setToOnboard}) => {
             const docRef = await setDoc(userProfileDocRef, {
                 Username: username,
                 Daily_Calories: dailyGoal,
-                Weight: weight,
                 Height: height,
                 Birthdate: birthdate,
                 Gender: gender,
                 Activity_Level: activityLevel,
                 Goal: goal,
             }, {merge: true});
+            await addWeight();
             setStep(step + 1);
         } catch (err) {
             console.error("Error adding user profile:", err);
         }
+    }
+
+    const addWeight = () => {
+        const userWeightDocRef = doc(db, "Users", userId, "User_Weight", Date.now().toString());
+        setDoc(userWeightDocRef, {
+            value: weight,
+            time: new Date(),
+        });
     }
 
     const preventSubmit = (e) => {
@@ -63,7 +72,7 @@ const OnboardUser = ({setToOnboard}) => {
                         <label htmlFor='usernameField' >Username</label>
                         <br></br>
                         <input required id='usernameField' type='text' value={username} onChange={e => setUsername(e.target.value)}></input>
-                        {invalid && <p className='invalidFields'>Please enter a username</p>}
+                        {invalid && <p className='invalidFields'>{errorMessage}</p>}
                     </form>, 
         },
         {
@@ -141,14 +150,28 @@ const OnboardUser = ({setToOnboard}) => {
             
       ];
 
-      const handleNext = (e) => {
+      const handleNext = async (e) => {
         console.log(e.target.value);
         if (step > steps.length) {
             return;
         }
-        if (step > 0 && username == "") {
-            setInvalid(true);
-            return;
+        if (step == 1) {
+            if (username == '') {
+                setErrorMessage("Please enter a username");
+                setInvalid(true);
+                return;
+            } else {
+                const toUserIdQuery = query(collection(db, "Users"), where("Username", "==", username));
+                const toUserIdSnapshot = await getDocs(toUserIdQuery);
+                if (!toUserIdSnapshot.empty) {
+                    setErrorMessage("Username already exists");
+                    setInvalid(true);
+                    return;
+                } else {
+                    console.log("No user found with that username");
+                }
+            }
+
         }
 
         if (step == 3 && (birthdate == ''|| birthdate == null || new Date() < new Date(birthdate))) {

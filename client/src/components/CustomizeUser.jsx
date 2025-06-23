@@ -84,7 +84,6 @@ const CustomizeUser = () => {
         setDoc(userProfileDocRef, {
             Username: username,
             Daily_Calories: dailyCalories,
-            Weight: weight,
             Height: height,
             Birthdate: new Date(birthdate),
             Gender: gender,
