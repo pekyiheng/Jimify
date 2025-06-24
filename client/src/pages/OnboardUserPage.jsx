@@ -17,7 +17,7 @@ const OnboardUser = ({setToOnboard}) => {
     const [birthdate, setBirthdate] = useState(formatDateToYYYYMMDD(new Date()));
     const [gender, setGender] = useState('M');
     const [activityLevel, setActivityLevel] = useState('sedentary');
-    const [goal, setGoal] = useState('maintain');
+    const [goal, setGoal] = useState('0');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -31,7 +31,7 @@ const OnboardUser = ({setToOnboard}) => {
                 Username: username,
                 Daily_Calories: dailyGoal,
                 Height: height,
-                Birthdate: birthdate,
+                Birthdate: new Date(birthdate),
                 Gender: gender,
                 Activity_Level: activityLevel,
                 Goal: goal,
@@ -77,13 +77,14 @@ const OnboardUser = ({setToOnboard}) => {
         },
         {
           id: 2,
-          content: <form onSubmit={preventSubmit}>
+          content: <form onSubmit={preventSubmit} className='radio-button-container'>
                         <label htmlFor='genderField' >What is your gender?</label>
                         <br></br>
                         <select required id='genderField' value={gender} onChange={e => setGender(e.target.value)} >
                             <option value='M' >Male</option>
                             <option value='F' >Female</option>
                         </select>
+
                     </form>
         },
         {
@@ -117,6 +118,7 @@ const OnboardUser = ({setToOnboard}) => {
             id: 6,
           content: <form onSubmit={preventSubmit}>
                         <label htmlFor='goalField' >What is your goal?</label>
+                        <br></br>
                         <select required id="goalField" name="goalField" value={goal} onChange={(e) => setGoal(e.target.value)}>
                             <option value="gain fast">Gain weight (fast)</option>
                             <option value="gain slow">Gain weight (slow)</option>
@@ -124,6 +126,7 @@ const OnboardUser = ({setToOnboard}) => {
                             <option value="lose slow">Lose weight (slow)</option>
                             <option value="lose fast">Lose weight (fast 0.5kg/week)</option>
                         </select>
+                        
                         <br></br>
                     </form>
         },
@@ -151,7 +154,6 @@ const OnboardUser = ({setToOnboard}) => {
       ];
 
       const handleNext = async (e) => {
-        console.log(e.target.value);
         if (step > steps.length) {
             return;
         }

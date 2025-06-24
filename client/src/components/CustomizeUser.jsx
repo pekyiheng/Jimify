@@ -75,7 +75,7 @@ const CustomizeUser = () => {
         console.log(age);
         const dailyGoal = Math.round(calculateBMR(gender, weight, height, age, getActivityLevel(activityLevel)) + getGoal(goal));
         setDailyCalories(dailyGoal);
-    }, [activityLevel, goal])
+    }, [gender, height, weight, activityLevel, goal]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -102,22 +102,19 @@ const CustomizeUser = () => {
                 </header>
                 <div>
                     <form onSubmit={handleSubmit}>
-                        <label htmlFor='usernameField' >Username</label>
-                        <input required id='usernameField' type='text' value={username} onChange={e => setUsername(e.target.value)}></input>
-                        <br></br>
-                        <label htmlFor='genderField' >What is your gender?</label>
+                        <label htmlFor='genderField' >Gender </label>
                         <select required id='genderField' value={gender} onChange={e => setGender(e.target.value)} >
                             <option value='M' >Male</option>
                             <option value='F' >Female</option>
                         </select>
                         <br></br>
-                        <label htmlFor='birthdateField' >What is your birthdate?</label>
+                        <label htmlFor='birthdateField' >Birthdate </label>
                         <input required id='birthdateField' type='date' value={birthdate} onChange={e => setBirthdate(e.target.value)} ></input>
                         <br></br>
-                        <label htmlFor='heightField' >What is your height?</label>
+                        <label htmlFor='heightField' >Height</label>
                         <input required id='heightField' type='number' value={height} onChange={e => setHeight(e.target.value)} ></input>
                         <br></br>
-                        <label htmlFor='goalField' >What is your goal?</label>
+                        <label htmlFor='goalField' >Current goal </label>
                         <select required id="goalField" name="goalField" value={goal} onChange={(e) => setGoal(e.target.value)}>
                             <option value="gain fast">Gain weight (fast)</option>
                             <option value="gain slow">Gain weight (slow)</option>
@@ -126,7 +123,7 @@ const CustomizeUser = () => {
                             <option value="lose fast">Lose weight (fast 0.5kg/week)</option>
                         </select>
                         <br></br>
-                        <label htmlFor='activityField' >How active are you??</label>
+                        <label htmlFor='activityField' >Activity Level </label>
                         <select required id="activityField" name="activityField" value={activityLevel} onChange={(e) => setActivityLevel(e.target.value)} >
                             <option value="sedentary">Sedentary</option>
                             <option value="light">Lightly active</option>

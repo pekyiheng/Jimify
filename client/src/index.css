@@ -42,7 +42,7 @@ button, .button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #f9f9f9;
+  background-color: #775a5a;
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -63,7 +63,7 @@ button:focus-visible {
   a:hover {
     color: #747bff;
   }
-  button {
+  button, .button {
     background-color: #f9f9f9;
   }
 }
