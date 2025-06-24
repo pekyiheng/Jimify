@@ -15,6 +15,7 @@ const WeightPage = () => {
     const [newWeight, setNewWeight] = useState("");
     const [imageFile, setImageFile] = useState(null);
 
+    const reversedWeights = [...oldWeight].sort((a ,b) => b.time - a.time);
 
     useEffect(() => {
         fetchWeights(userId);
@@ -162,7 +163,7 @@ const WeightPage = () => {
 
             <div className="weightHistoryContainer">
                 <ul className="verticalListOfBoxes">
-                    {oldWeight.map((entry, index) => 
+                    {reversedWeights.map((entry, index) => 
                         (<li className="listItemInBox" key={entry.id}><WeightEntry weight={entry.value} time={entry.time} imageUrl={entry.imageUrl} onDelete={() => handleDeleteWeight(entry.id)}/></li>))}
                 </ul>
             </div>
