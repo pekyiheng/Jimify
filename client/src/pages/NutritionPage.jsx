@@ -1,7 +1,6 @@
 import CaloriesWidget from '../components/CaloriesWidget';
 import WeightWidget from '../components/WeightWidget';
 import { useState, useEffect } from 'react';
-import CustomizeUser from '../components/CustomizeUser';
 import { getDoc, doc, increment } from "firebase/firestore";
 import { db, auth } from "../firebase_config"
 import { formatDateToYYYYMMDD } from '../helper';
@@ -34,7 +33,6 @@ const NutritionPage = () => {
 
   return (
       <>
-        <CustomizeUser />
         <div className='widgets'>
           <Link to="/caloriesPage">
             <CaloriesWidget totalCalories={totalCalories} dailyCaloriesGoal={dailyCaloriesGoal} />

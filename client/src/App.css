@@ -74,11 +74,9 @@
 #userNotFoundMessage, #userExists, .invalidFields{
   color: red;
 }
-.button {
-  margin: 10px;
-}
+
 .button:hover {
-  background-color: #e99393;
+  
 }
 .buttonContainer {
   display: flex;

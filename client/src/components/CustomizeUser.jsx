@@ -90,6 +90,7 @@ const CustomizeUser = () => {
             Activity_Level: activityLevel,
             Goal: goal,
         }, {merge: true});
+        setShowDialog(false);
 
     }
 
@@ -132,7 +133,7 @@ const CustomizeUser = () => {
                             <option value="very active">Very active</option>
                         </select>
                         <h4>Current weight: {weight} kg</h4>
-                        <button onClick={toggleDialog}>Close</button>
+                        <button type='button' onClick={toggleDialog}>Close</button>
                         <input type='submit' value="Save" className='button' ></input>
                     </form>
                     <p>Daily calories goal: {dailyCalories}</p>
