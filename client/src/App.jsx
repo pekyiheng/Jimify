@@ -67,7 +67,7 @@ function App() {
     if (toOnboard) {
       return (
         <div className='app'>
-          <Header />
+          <Header toOnboard={toOnboard} />
           <OnboardUser setToOnboard={setToOnboard} />
         </div>
         
@@ -76,7 +76,7 @@ function App() {
     } else {
       return (
         <div className='app'>
-          <Header />
+          <Header toOnboard={toOnboard} />
           <Outlet />
           <NavBar />
           <ExperienceBar />

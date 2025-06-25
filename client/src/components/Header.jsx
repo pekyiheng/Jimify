@@ -5,7 +5,7 @@ import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import CustomizeUser from '../components/CustomizeUser';
 
-const Header = () => {
+const Header = ({toOnboard}) => {
     const [showSignOut, setShowSignOut] = useState(false);
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -28,7 +28,7 @@ const Header = () => {
             <h1>Jimify <GiWeightLiftingUp /></h1>
             
             {showSignOut && <>
-                                <CustomizeUser />
+                                {!toOnboard && <CustomizeUser />}
                                 <button onClick={handleLogOut}>Sign out</button>
                             </>
             }
