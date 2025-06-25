@@ -59,6 +59,24 @@ const OnboardUser = ({setToOnboard}) => {
         setToOnboard(false);
     }
 
+    const handleHeight = (e) => {
+        if (Number.isNaN(e.target.value)) {
+            return;
+        }
+        
+        setHeight(parseInt(e.target.value));
+    }
+
+    const handleWeight = (e) => {
+        if (Number.isNaN(e.target.value)) {
+            return;
+        }
+
+        setWeight(parseInt(e.target.value))
+    }
+
+    
+
     const steps = [
         {
             id: 0,
@@ -101,7 +119,7 @@ const OnboardUser = ({setToOnboard}) => {
           content: <form onSubmit={preventSubmit}>
                         <label htmlFor='heightField' >What is your height?</label>
                         <br></br>
-                        <input required id='heightField' type='number' value={height} onChange={e => setHeight(parseInt(e.target.value))} ></input>
+                        <input required id='heightField' type='number' value={height} onChange={handleHeight} ></input>
                         {invalid && <p className='invalidFields'>Please enter a valid height</p>}
                     </form>
         },
@@ -110,7 +128,7 @@ const OnboardUser = ({setToOnboard}) => {
           content: <form onSubmit={preventSubmit}>
                         <label htmlFor='initialWeightField' >What is your current weight?</label>
                         <br></br>
-                        <input required id='initialWeightField' type='number' value={weight} onChange={e => setWeight(parseInt(e.target.value))} ></input>
+                        <input required id='initialWeightField' type='number' value={weight} onChange={handleWeight} ></input>
                         {invalid && <p className='invalidFields'>Please enter a valid weight</p>}
                     </form>
         }, 
@@ -147,7 +165,12 @@ const OnboardUser = ({setToOnboard}) => {
             id: 8,
           content: <div>
             <p>Daily calories goal: {dailyCalories}</p>
-            <button onClick={backToHome}>Return</button>
+            </div>
+        }, {
+            id: 9,
+          content: <div>
+            <p>You're all set and ready to start your fitness journey..</p>
+            <button onClick={backToHome}>Let's Go </button>
             </div>
         }
             
@@ -181,12 +204,12 @@ const OnboardUser = ({setToOnboard}) => {
             return
         }
 
-        if (step == 4 && (height == null || height <= 0)) {
+        if (step == 4 && (Number.isNaN(height) || height == null || height <= 0)) {
             setInvalid(true);
             return
         }
 
-        if (step == 5 && (weight == null || weight <= 0)) {
+        if (step == 5 && (Number.isNaN(weight) || weight == null || weight <= 0)) {
             setInvalid(true);
             return
         }
@@ -194,6 +217,11 @@ const OnboardUser = ({setToOnboard}) => {
         setInvalid(false);
         setStep(step + 1);
       };
+
+      const handleBack = () => {
+        setInvalid(false);
+        setStep(step - 1);
+      }
     
 
     return (
@@ -202,13 +230,13 @@ const OnboardUser = ({setToOnboard}) => {
                 {steps[step].content}
             </div>
             <div>
-                {step > 0 && (
-                    <button onClick={() => setStep(step - 1)}>Back</button>
+                {step > 0 && step < steps.length - 2 && (
+                    <button onClick={handleBack}>Back</button>
                 )}
-                {step < steps.length - 2 && (
+                {step < steps.length - 1 && step != steps.length - 3 && (
                     <button onClick={handleNext}>Next</button>
                 )}
-                {step == steps.length - 2 && (
+                {step == steps.length - 3 && (
                     <button onClick={handleSubmit}>Submit</button>
                 )}
                 
