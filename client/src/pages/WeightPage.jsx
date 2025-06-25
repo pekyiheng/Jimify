@@ -15,7 +15,17 @@ const WeightPage = () => {
     const [newWeight, setNewWeight] = useState("");
     const [imageFile, setImageFile] = useState(null);
 
-    const reversedWeights = [...oldWeight].sort((a ,b) => b.time - a.time);
+    const [showAllWeights, setShowAllWeights] = useState(false);
+
+    const pastMonthWeights = () => {
+        const now = new Date();
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setDate(now.getDate() - 30);
+        return oldWeight.filter(entry => entry.time >= oneMonthAgo);
+    }
+
+    const displayWeights = [...(showAllWeights ? oldWeight : pastMonthWeights())];
+    const reversedWeights = [...displayWeights].reverse();
 
     useEffect(() => {
         fetchWeights(userId);
@@ -112,11 +122,11 @@ const WeightPage = () => {
     ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
     const chartData = {
-        labels: oldWeight.map(entry => entry.time.toLocaleDateString("en-GB", { day: "2-digit", month: "short"})),
+        labels: displayWeights.map(entry => entry.time.toLocaleDateString("en-GB", { day: "2-digit", month: "short"})),
         datasets: [
             {
                 label: 'Weight (KG)',
-                data: oldWeight.map(entry => entry.value),
+                data: displayWeights.map(entry => entry.value),
                 fill: false,
                 borderColor: 'rgb(24, 22, 172)',
                 tension: 0
@@ -159,6 +169,7 @@ const WeightPage = () => {
                     onChange={(e) => setImageFile(e.target.files[0])}
                 />
                 <button onClick={handleNewWeight} disabled={!newWeight}>Submit Weight Entry</button>
+                <button onClick={() => setShowAllWeights(!showAllWeights)}>{showAllWeights ? "Show entries for the past month" : "Show all entries"}</button>
             </div>
 
             <div className="weightHistoryContainer">

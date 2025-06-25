@@ -11,6 +11,14 @@ const WeightWidget = () => {
     
     const [oldWeight, setWeight] = useState([]);
 
+    const pastMonthWeights = () => {
+        const now = new Date();
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setDate(now.getDate() - 30);
+        return oldWeight.filter(entry => entry.time >= oneMonthAgo);
+    }
+
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -46,11 +54,11 @@ const WeightWidget = () => {
     ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
     const chartData = {
-        labels: oldWeight.map(entry => entry.time.toLocaleDateString("en-GB", { day: "2-digit", month: "short"})),
+        labels: pastMonthWeights().map(entry => entry.time.toLocaleDateString("en-GB", { day: "2-digit", month: "short"})),
         datasets: [
             {
                 label: 'Weight (KG)',
-                data: oldWeight.map(entry => entry.value),
+                data: pastMonthWeights().map(entry => entry.value),
                 fill: false,
                 borderColor: 'rgb(24, 22, 172)',
                 tension: 0
