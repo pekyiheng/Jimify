@@ -75,9 +75,6 @@
   color: red;
 }
 
-.button:hover {
-  
-}
 .buttonContainer {
   display: flex;
   justify-content: center;
@@ -155,4 +152,18 @@
   background-color: #007bff; 
   color: rgb(139, 88, 88); 
   border-color: #007bff;
+}
+
+.OrLineBreak {
+  display: flex; 
+  align-items: center;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.OrLineBreak > hr {
+  flex-grow: 1;
+}
+.OrLineBreak > span {
+  flex-grow: 0.25;
 }
