@@ -17,7 +17,19 @@ const TrainingPage = () => {
     const [showWorkoutForm, setShowWorkoutForm] = useState(false);
     const [workoutPlanForLogging, setWorkoutPlanForLogging] = useState("");
     const [workoutForLogging, setWorkoutForLogging] = useState([]);
+    const [showAllWorkouts, setShowAllWorkouts] = useState(false);
+
+    const pastSevenDaysWorkouts = () => {
+        const now = new Date();
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(now.getDate() - 7);
+        return oldWorkout.filter(workout => workout.time >= oneWeekAgo);
+    }
     
+    const nameOfBodyParts = ["Chest", "Shoulders", "Core", "Back", "Triceps", "Biceps", "Quadriceps", "Hamstrings", "Calves"];
+    const numberOfBodyParts = nameOfBodyParts.length;
+    const [numberOfTimesHit, setNumberOfTimesHit] = useState(Array(numberOfBodyParts).fill(0));
+
     const [oldWeight, setWeight] = useState([]); // fetch user weight for exp calc
 
     const { exp, userId } = useUser();
@@ -45,6 +57,20 @@ const TrainingPage = () => {
             setWorkoutForLogging([]);
         }
     }, [showWorkoutForm, oldWorkoutPlan])
+
+    useEffect(() => {
+        const counts = Array(numberOfBodyParts).fill(0);
+        const recentWorkouts = pastSevenDaysWorkouts();
+        recentWorkouts.forEach(workout => {
+            workout.exercises.forEach(ex => {
+                const i = nameOfBodyParts.indexOf(ex.bodyPart);
+                if (i !== -1) {
+                    counts[i]++;
+                }
+            });
+        });
+        setNumberOfTimesHit(counts);
+    }, [oldWorkout]);
     
     const fetchWorkoutPlan = async (uid) => {
         const userWorkoutPlanColRef = collection(db, "Users", uid, "User_Workout_Plan");
@@ -105,6 +131,7 @@ const TrainingPage = () => {
                 return {
                     id: docSnap.id,
                     exercise: docData.exercise,
+                    bodyPart: docData.bodyPart,
                 };
             });
     
@@ -219,8 +246,9 @@ const TrainingPage = () => {
     }
 
     const handleNewExercise = () => {
-        if (!selectedExercises.some(ex => ex.exercise == newExercise)) { // no duplicate exercises in array
-            setSelectedExercises([...selectedExercises, {exercise: newExercise, weight: 60, sets: 3, reps: 10, restMinutes: 3, restSeconds: 0}]);
+        const selected = exerciseOptions.find(ex => ex.exercise == newExercise);
+        if (!selectedExercises.some(ex => ex.exercise == selected.exercise)) { // no duplicate exercises in array
+            setSelectedExercises([...selectedExercises, {exercise: selected.exercise, bodyPart: selected.bodyPart, weight: 60, sets: 3, reps: 10, restMinutes: 3, restSeconds: 0}]);
             setNewExercise(exerciseOptions.length > 0 ? exerciseOptions[0].exercise : "");
         } else {
             console.error("Error adding exercise");
@@ -320,6 +348,14 @@ const TrainingPage = () => {
                 <button onClick={onDelete} className="button">Delete</button>
             </div>
         );
+    }
+
+    function BodyPart({ name, count }) {
+        return (
+            <div>
+                <p>{name}: {count}</p>
+            </div>
+        )
     }
  
     return (
@@ -425,10 +461,18 @@ const TrainingPage = () => {
             </div>
 
             <div>
-                <h2>Past Workouts</h2>
+                <div>
+                    <h2>Body parts hit in past week</h2>
+                    <ul className="listWithNoPointers">
+                        {nameOfBodyParts.map((entry, index) => 
+                        (<li key={entry}><BodyPart name={entry} count={numberOfTimesHit[index]}/></li>))}
+                    </ul>
+                </div>
+                <h2>{showAllWorkouts ? "All past workouts" : "Workouts in past week"}</h2>
                 <div className="buttonContainer">
                     <p className="spacingBelow">Tip: Hitting your workout expectations grants extra EXP!</p>
                     <button onClick={() => setShowWorkoutForm(true)} className="button">+ Log Your Workout</button>
+                    <button onClick={() => setShowAllWorkouts(!showAllWorkouts)} className="button">{showAllWorkouts ? "Show only past 7 days" : "Show all past workouts"}</button>
                 </div>
                 
                  {showWorkoutForm && (
@@ -500,7 +544,11 @@ const TrainingPage = () => {
                 )}
 
                 <ul className="verticalListOfBoxes">
-                    {oldWorkout.map((entry, index) => 
+                    {(showAllWorkouts 
+                        ? oldWorkout
+                        : pastSevenDaysWorkouts())
+                        .sort((a, b) => b.time - a.time)
+                        .map((entry, index) => 
                         (<li className="listItemInBox" key={entry.id}><Workout name={entry.workout} exercises={entry.exercises} time={entry.time} onDelete={() => handleDeleteWorkout(entry.id)}/></li>))}
                 </ul>
             </div>
