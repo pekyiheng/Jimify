@@ -94,6 +94,24 @@ const CustomizeUser = () => {
 
     }
 
+    const handleHeightChange = (e) => {
+        if (e.target.value < 0) {
+            setHeight(0);
+            return;
+        }
+
+        setHeight(e.target.value);
+    }
+
+    const handleBirthdateChange = (e) => {
+        if (new Date() < new Date(e.target.value)) {
+            return;
+        }
+        
+        setBirthdate(e.target.value)
+        
+    }
+
     return (
         <>
             <button onClick={toggleDialog}>Edit profile</button>
@@ -110,10 +128,10 @@ const CustomizeUser = () => {
                         </select>
                         <br></br>
                         <label htmlFor='birthdateField' >Birthdate </label>
-                        <input required id='birthdateField' type='date' value={birthdate} onChange={e => setBirthdate(e.target.value)} ></input>
+                        <input required id='birthdateField' type='date' value={birthdate} onChange={handleBirthdateChange} ></input>
                         <br></br>
                         <label htmlFor='heightField' >Height</label>
-                        <input required id='heightField' type='number' value={height} onChange={e => setHeight(e.target.value)} ></input>
+                        <input required id='heightField' type='number' value={height} onChange={handleHeightChange} ></input>
                         <br></br>
                         <label htmlFor='goalField' >Current goal </label>
                         <select required id="goalField" name="goalField" value={goal} onChange={(e) => setGoal(e.target.value)}>

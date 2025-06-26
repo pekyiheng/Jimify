@@ -9,7 +9,8 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
     const [foodList, setFoodList] = useState([]);
     const [newFood, setNewFood] = useState("");
     const [newCal, setNewCal] = useState(0);
-    
+    const [showErr, setShowErr] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         fetchFoodList(userId);
@@ -36,10 +37,34 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
         }
     }
 
+    const handleNewCalChange = (e) => {
+
+        if (e.target.value < 0) {
+            setNewCal(0);
+        } else {
+            setShowErr(false);
+            setNewCal(e.target.value);
+        }
+        
+    }
+
     const handleAddFood = async (e) => {
         e.preventDefault();
         const userCaloriesDocRef = doc(db, "Users", userId, "User_Calories", curDate);
         const calToAdd = parseInt(newCal, 10);
+
+        if (newFood == "") {
+            setErrorMessage("Please enter a food name");
+            setShowErr(true);
+
+            return;
+        }
+
+        if (isNaN(calToAdd) || calToAdd < 0) {
+            setErrorMessage("Please enter a valid calorie value");
+            setShowErr(true);
+            return;
+        }
         
         try {
             await setDoc(userCaloriesDocRef, {
@@ -95,19 +120,20 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
                 ))}
             </ul>
             <div>
-                <Popup trigger={<button> + Add food </button>}>
-                    <div style={{border: "solid", padding:"10px"}}>
+                <Popup trigger={<button> + Add food </button>} onClose={() => setShowErr(false)}>
+                    <div className='AddFoodPopup'>
                         <form onSubmit={handleAddFood}>
                             <div id='food'>
                                 <label>Food</label>
                                 <input name='foodItem' type='text' onChange={(e) => setNewFood(e.target.value)}></input>
                             </div>
-                            <span>
+                            <div>
                                 <label>Cal</label>
-                                <input name='caloriesVal' type='number' onChange={(e) => setNewCal(e.target.value)}></input>
-                            </span>
+                                <input name='caloriesVal' type='number' placeholder='0' value={newCal} onChange={handleNewCalChange}></input>
+                            </div>
                             <br></br>
                             <button type='submit'>Add</button>
+                            {showErr && <p className='invalidFields'>{errorMessage}</p>}
                         </form>
                     </div>
                 </Popup>

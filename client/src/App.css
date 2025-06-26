@@ -160,6 +160,11 @@
   text-align: center;
   margin: 10px 0;
 }
+.AddFoodPopup {
+  border: solid;
+  padding: 10px;
+  background: rgb(37, 37, 37);
+}
 
 .OrLineBreak > hr {
   flex-grow: 1;

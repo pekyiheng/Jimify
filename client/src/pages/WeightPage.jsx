@@ -47,7 +47,7 @@ const WeightPage = () => {
 
     const handleNewWeight = async () => {
         const value = parseFloat(newWeight);
-        if (isNaN(value)) return alert("Please enter a valid number");
+        if (isNaN(value) || value <= 0) return alert("Please enter a valid number");
 
 
         const time = new Date();
