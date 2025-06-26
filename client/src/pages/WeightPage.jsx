@@ -6,6 +6,7 @@ import { Line } from 'react-chartjs-2';
 import { useUser } from "../UserContext";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { storage } from "../firebase_config"
+import { calculateBMR, getActivityLevel, getGoal } from "../helper";
 
 
 const WeightPage = () => {
@@ -55,10 +56,21 @@ const WeightPage = () => {
         }
     }
 
+    const updateUserWeightField = async (newWeight) => {
+        const userDocRef = doc(db, "Users", userId);
+        //updates weight in user document
+        const docSnap = await getDoc(userDocRef);
+        const data = docSnap.data();
+        const newDailyCalories = Math.round(calculateBMR(data.Gender, newWeight, data.Height, new Date().getFullYear() - new Date(data.Birthdate.toDate()).getFullYear(), getActivityLevel(data.Activity_Level)) + parseInt(getGoal(data.Goal)));
+        setDoc(userDocRef, {
+            Weight: newWeight,
+            Daily_Calories: newDailyCalories,
+        }, { merge: true });
+    }
+
     const handleNewWeight = async () => {
         const value = parseFloat(newWeight);
         if (isNaN(value) || value <= 0) return alert("Please enter a valid number");
-
 
         const time = new Date();
         let imageUrl = "";
@@ -84,9 +96,7 @@ const WeightPage = () => {
                 const userWeightDocRef = doc(db, "Users", userId, "User_Weight", docId);
                 const userDocRef = doc(db, "Users", userId);
                 //updates weight in user document
-                await setDoc(userDocRef, {
-                    Weight: value,
-                }, { merge: true });
+                updateUserWeightField(value);
                 //updates weight in user weight collection
                 setDoc(userWeightDocRef, entry);
                 console.log("Successfully added to Firestore:", docId);
@@ -102,6 +112,9 @@ const WeightPage = () => {
         try {
             await deleteDoc(doc(db, "Users", userId, "User_Weight", id));
             const updatedWeights = oldWeight.filter((entry) => entry.id !== id);
+            const newLatestWeight = updatedWeights[updatedWeights.length - 1].value;
+            console.log(newLatestWeight)
+            updateUserWeightField(newLatestWeight);
             setWeight(updatedWeights);
         } catch (err) {
             console.error("Error deleting weight:", err);

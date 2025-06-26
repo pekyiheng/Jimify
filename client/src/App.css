@@ -4,10 +4,14 @@
   padding: 2rem;
   text-align: center;
   display: flex;
+  
 }
 .app {
   width:100%;
   flex: 1;
+  border: solid black;
+  padding: 20px;
+  
 }
 .header {
   align-self: self-start;

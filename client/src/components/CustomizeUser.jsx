@@ -75,7 +75,7 @@ const CustomizeUser = () => {
         console.log(age);
         const dailyGoal = Math.round(calculateBMR(gender, weight, height, age, getActivityLevel(activityLevel)) + getGoal(goal));
         setDailyCalories(dailyGoal);
-    }, [gender, height, weight, activityLevel, goal]);
+    }, [gender, height, birthdate, activityLevel, goal]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
