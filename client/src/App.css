@@ -168,6 +168,7 @@
   border: solid;
   padding: 10px;
   background: rgb(37, 37, 37);
+  color: white;
 }
 
 .OrLineBreak > hr {
