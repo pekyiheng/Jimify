@@ -3,6 +3,83 @@ import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, updateDoc,
 import { db } from "../firebase_config"
 import { useUser } from '../UserContext';
 
+function Friends({ friendUserId, onRemove }) {
+    const [friendUsername, setFriendUsername] = useState("");
+
+    useEffect(() => {
+        const fetchFriendUsername = async () => {
+            try {
+                const docSnap = await getDoc(doc(db, "Users", friendUserId));
+                const data = docSnap.data();
+                setFriendUsername(data?.Username || "Unknown");
+            } catch (e) {
+                console.error(e);
+                return null;
+            }  
+        }
+        fetchFriendUsername();
+    }, [friendUserId])
+
+    return (
+        <>
+            <p>{friendUsername}</p>
+            <button className="button" onClick={onRemove}>Remove friend</button>
+        </>
+    )
+}
+
+function IncomingRequest({ fromUserId, onAccept, onReject }) {
+
+    const [fromUsername, setFromUsername] = useState("");
+
+    useEffect(() => {
+        const fetchFromUsername = async () => {
+            try {
+                const docSnap = await getDoc(doc(db, "Users", fromUserId));
+                const data = docSnap.data();
+                setFromUsername(data?.Username || "Unknown");
+            } catch (e) {
+                console.error(e);
+                return null;
+            }  
+        }
+        fetchFromUsername();
+    }, [fromUserId])
+
+    return (
+        <>
+            <p>{fromUsername}</p>
+            <button className="button" onClick={onAccept}>Accept</button>
+            <button className="button" onClick={onReject}>Reject</button>
+        </>
+    );
+}
+
+function OutgoingRequest({ toUserId }) {
+    const [toUsername, setToUsername] = useState("");
+
+    useEffect(() => {
+        const fetchToUsername = async () => {
+            try {
+                const docSnap = await getDoc(doc(db, "Users", toUserId));
+                const data = docSnap.data();
+                setToUsername(data?.Username || "Unknown");
+            } catch (e) {
+                console.error(e);
+                return null;
+            }  
+        }
+        fetchToUsername();
+    }, [toUserId])
+        
+    return (
+        <>
+            <p>{toUsername}</p>
+            <p>Status: PENDING</p>
+        </>
+    );
+}
+
 const FriendsPage = () => {
 
     const { userId } = useUser();
@@ -82,7 +159,8 @@ const FriendsPage = () => {
                 friends: arrayUnion(userId),
             }, { merge: true });
 
-            fetchFriends(userId);
+            ///fetchFriends(userId);
+            setFriends(prev => [...prev, fromUserId]);
 
         } catch (err) {
             console.error("Error accepting request:", err);
@@ -155,83 +233,6 @@ const FriendsPage = () => {
         } catch (err) {
             console.error("Error removing friend: ", err);
         }
-    }
-
-    function Friends({ friendUserId, onRemove }) {
-        const [friendUsername, setFriendUsername] = useState("");
-
-        useEffect(() => {
-            const fetchFriendUsername = async () => {
-                try {
-                    const docSnap = await getDoc(doc(db, "Users", friendUserId));
-                    const data = docSnap.data();
-                    setFriendUsername(data?.Username || "Unknown");
-                } catch (e) {
-                    console.error(e);
-                    return null;
-                }  
-            }
-            fetchFriendUsername();
-        }, [friendUserId])
-
-        return (
-            <>
-                <p>{friendUsername}</p>
-                <button className="button" onClick={onRemove}>Remove friend</button>
-            </>
-        )
-    }
-
-    function IncomingRequest({ fromUserId, onAccept, onReject }) {
-
-        const [fromUsername, setFromUsername] = useState("");
-
-        useEffect(() => {
-            const fetchFromUsername = async () => {
-                try {
-                    const docSnap = await getDoc(doc(db, "Users", fromUserId));
-                    const data = docSnap.data();
-                    setFromUsername(data?.Username || "Unknown");
-                } catch (e) {
-                    console.error(e);
-                    return null;
-                }  
-            }
-            fetchFromUsername();
-        }, [fromUserId])
-
-        return (
-            <>
-                <p>{fromUsername}</p>
-                <button className="button" onClick={onAccept}>Accept</button>
-                <button className="button" onClick={onReject}>Reject</button>
-            </>
-        );
-    }
-
-    function OutgoingRequest({ toUserId }) {
-        const [toUsername, setToUsername] = useState("");
-
-        useEffect(() => {
-            const fetchToUsername = async () => {
-                try {
-                    const docSnap = await getDoc(doc(db, "Users", toUserId));
-                    const data = docSnap.data();
-                    setToUsername(data?.Username || "Unknown");
-                } catch (e) {
-                    console.error(e);
-                    return null;
-                }  
-            }
-            fetchToUsername();
-        }, [toUserId])
-        
-        return (
-            <>
-                <p>{toUsername}</p>
-                <p>Status: PENDING</p>
-            </>
-        );
     }
 
     return ( 
