@@ -36,7 +36,14 @@ const LoginPage = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCred = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCred.user;
+            if (!user.emailVerified) {
+                setErrorMessage("Please verify your email before logging in.");
+                setHiddenTag(false);
+                await auth.signOut();
+                return;
+            }
             navigate("/");
             
         } 
