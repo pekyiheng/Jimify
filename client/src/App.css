@@ -146,6 +146,15 @@
 .spacingBelow {
   margin-bottom: 1rem; 
 }
+.highlighted {
+  cursor: pointer;
+  color: #007bff;
+}
+.profilePicture {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+}
 
 
 .radio-button-container input[type="radio"] {
