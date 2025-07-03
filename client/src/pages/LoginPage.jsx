@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link , useNavigate} from "react-router-dom";
 import '../App.css';
 import { auth } from '../firebase_config'; 
-import { signInWithEmailAndPassword, signInAnonymously, signInWithPopup, GoogleAuthProvider  } from "firebase/auth";
+import { signInWithEmailAndPassword, signInAnonymously, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail  } from "firebase/auth";
 import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
 import GoogleButton from "react-google-button";
@@ -68,6 +68,35 @@ const LoginPage = () => {
         
     };
 
+    const handlePasswordReset = async () => {
+        if (!email) {
+            setErrorMessage("Please enter your email address.");
+            setHiddenTag(false);
+            return;
+        }
+
+        try {
+            await sendPasswordResetEmail(auth, email);
+            setErrorMessage("Check your email inbox for password reset instructions.");
+            setHiddenTag(false);
+        }
+        catch (e) {
+            console.error("Password reset error: ", e.message);
+            setHiddenTag(false);
+
+            switch (e.code) {
+                case "auth/user-not-found":
+                    setErrorMessage("No user found with this email");
+                    break;
+                case "auth/invalid-email":
+                    setErrorMessage("Please enter a valid email address.");
+                    break;
+                default:
+                    setErrorMessage("Password reset failed. Please try again.");
+            }
+        }
+    }
+
     return (
         <div>
             <h2>Login</h2>
@@ -83,6 +112,7 @@ const LoginPage = () => {
                 </div>
                 
                 <button type="submit" className="button">Login</button>
+                <button type="button" className="button" onClick={handlePasswordReset}>Reset Password</button>
 
                 <p hidden={hiddenTag} id="userNotFoundMessage">{errorMessage}</p>
             </form>

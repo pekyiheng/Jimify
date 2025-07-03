@@ -10,6 +10,7 @@ import NutritionPage from './pages/NutritionPage';
 import TrainingPage from './pages/TrainingPage';
 import WorkoutStartPage from './pages/WorkoutStartPage.jsx';
 import FriendsPage from './pages/FriendsPage.jsx';
+import MyProfilePage from './pages/MyProfilePage.jsx';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import OtherLayout from './OtherLayout';
@@ -26,7 +27,8 @@ const router = createBrowserRouter([
       { path: "weightPage", element: <WeightPage />},
       { path: "trainingPage", element: <TrainingPage /> },
       { path: "workoutStartPage", element: <WorkoutStartPage />},
-      { path: "friendsPage", element: <FriendsPage />},  
+      { path: "friendsPage", element: <FriendsPage />},
+      { path: "myProfilePage", element: <MyProfilePage />},  
     ],
   }, 
   {
