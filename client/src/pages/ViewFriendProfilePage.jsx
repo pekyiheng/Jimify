@@ -20,6 +20,7 @@ const ViewFriendProfilePage = () => {
     const [height, setHeight] = useState(0);
     const [goal, setGoal] = useState("");
     const [profilePicture, setProfilePicture] = useState("");
+    const [level, setLevel] = useState(0);
 
     useEffect(() => {
         fetchActivity(friendUserId);
@@ -66,6 +67,7 @@ const ViewFriendProfilePage = () => {
             setHeight(data.Height);
             setUsername(data.Username);
             setProfilePicture(data.Profile_Picture || "");
+            setLevel(Math.floor(Math.pow(data.exp / 100, 2/3)));
         }
         catch (e) {
             console.error(e);
@@ -89,6 +91,7 @@ const ViewFriendProfilePage = () => {
                 : (<VscAccount size={150}/>)}
             <br/>
             <p>Username: {username}</p>
+            <p>Level: {level}</p>
             <p>Gender: {gender}</p>
             <p>Birthday: {birthdate.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
             <p>Height: {height}</p>

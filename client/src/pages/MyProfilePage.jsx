@@ -20,6 +20,7 @@ const MyProfilePage = () => {
     const [profilePicture, setProfilePicture] = useState("");
     const [changeProfilePicture, setChangeProfilePicture] = useState(false);
     const [newProfilePicture, setNewProfilePicture] = useState("");
+    const [level, setLevel] = useState(0);
 
     useEffect(() => {
         fetchActivity(userId);
@@ -66,6 +67,7 @@ const MyProfilePage = () => {
             setHeight(data.Height);
             setUsername(data.Username);
             setProfilePicture(data.Profile_Picture || "");
+            setLevel(Math.floor(Math.pow(data.exp / 100, 2/3)));
         }
         catch (e) {
             console.error(e);
@@ -125,6 +127,7 @@ const MyProfilePage = () => {
                 : (<></>)}
             
             <p>Username: {username}</p>
+            <p>Level: {level}</p>
             <p>Gender: {gender}</p>
             <p>Birthday: {birthdate.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
             <p>Height: {height}</p>
