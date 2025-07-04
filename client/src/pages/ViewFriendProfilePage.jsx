@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
-import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, updateDoc, increment, query, where, arrayUnion, arrayRemove } from "firebase/firestore";
+import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, updateDoc, increment, query, where } from "firebase/firestore";
 import { db } from "../firebase_config"
 import { useUser } from '../UserContext';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { VscAccount } from "react-icons/vsc";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebase_config";
 
+const ViewFriendProfilePage = () => {
+    const { exp, userId } = useUser();
+    
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { friendUserId } = location.state || {};
 
-const MyProfilePage = () => {
-
-    const { userId } = useUser();
     const [activity, setActivity] = useState([]);
     const [username, setUsername] = useState("");
     const [activityLevel, setActivityLevel] = useState("");
@@ -18,12 +20,10 @@ const MyProfilePage = () => {
     const [height, setHeight] = useState(0);
     const [goal, setGoal] = useState("");
     const [profilePicture, setProfilePicture] = useState("");
-    const [changeProfilePicture, setChangeProfilePicture] = useState(false);
-    const [newProfilePicture, setNewProfilePicture] = useState("");
 
     useEffect(() => {
-        fetchActivity(userId);
-        fetchDetails(userId);
+        fetchActivity(friendUserId);
+        fetchDetails(friendUserId);
     }, [])
 
     const fetchActivity = async (uid) => {
@@ -73,28 +73,6 @@ const MyProfilePage = () => {
         }
     }
 
-    const handleNewProfilePicture = async () => {
-        if (!newProfilePicture) {
-            return;
-        }
-        const storageRef = ref(storage, `Users/${userId}/ProfilePicture.jpg`);
-        try {
-            await uploadBytes(storageRef, newProfilePicture);
-            const downloadURL = await getDownloadURL(storageRef);
-
-            await updateDoc(doc(db, "Users", userId), {
-                Profile_Picture: downloadURL
-            });
-
-            alert("Profile picture updated");
-            setNewProfilePicture("");
-            setProfilePicture(downloadURL);
-            setChangeProfilePicture(false);
-        } catch (e) {
-            console.error("Error uploading profile picture: ", e);
-        }
-    }
-
     function ActivityEntry({ activity, time }) {
         return (
             <div>
@@ -105,25 +83,11 @@ const MyProfilePage = () => {
 
     return ( 
         <div>
-            <h2>My Profile</h2>
+            <h2>{username}'s Profile</h2>
             {profilePicture 
                 ? (<img src={profilePicture} className="profilePicture"/>)
                 : (<VscAccount size={150}/>)}
             <br/>
-            <span className="highlighted" onClick={() => setChangeProfilePicture(!changeProfilePicture)}>Change profile picture</span>
-            {changeProfilePicture
-                ? (
-                    <div>
-                        <input 
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => setNewProfilePicture(e.target.files[0])}
-                        />
-                        <br/>
-                        <button onClick={() => handleNewProfilePicture} disabled={!newProfilePicture}>Upload profile picture</button>
-                    </div>)
-                : (<></>)}
-            
             <p>Username: {username}</p>
             <p>Gender: {gender}</p>
             <p>Birthday: {birthdate.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
@@ -136,7 +100,7 @@ const MyProfilePage = () => {
                     (<li key={entry.id}><ActivityEntry activity={entry.note} time={entry.time}/></li>))}
             </ul>
         </div>
-    ) 
+    )
 }
 
-export default MyProfilePage;
+export default ViewFriendProfilePage;

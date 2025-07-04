@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, updateDoc, increment, query, where, arrayUnion, arrayRemove } from "firebase/firestore";
 import { db } from "../firebase_config"
 import { useUser } from '../UserContext';
+import { useNavigate } from 'react-router-dom';
 
-function Friends({ friendUserId, onRemove }) {
+function Friends({ friendUserId, onRemove, onViewProfile }) {
     const [friendUsername, setFriendUsername] = useState("");
 
     useEffect(() => {
@@ -24,6 +25,7 @@ function Friends({ friendUserId, onRemove }) {
         <>
             <p>{friendUsername}</p>
             <button className="button" onClick={onRemove}>Remove friend</button>
+            <button className="button" onClick={onViewProfile}>View Profile</button>
         </>
     )
 }
@@ -88,6 +90,7 @@ const FriendsPage = () => {
     const [outgoingRequests, setOutgoingRequests] = useState([]);
     const [addFriend, setAddFriend] = useState("");
     const [ownUsername, setOwnUsername] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchFriends(userId);
@@ -235,11 +238,19 @@ const FriendsPage = () => {
         }
     }
 
+    const handleViewFriend = (friendUserId) => {
+        navigate("/viewFriendProfilePage", {
+            state: {
+                friendUserId: friendUserId
+            }
+        })
+    }
+
     return ( 
         <div>
             <h2>Friends:</h2>
             <ul> {friends.map((entry, index) => 
-                (<li key={entry}><Friends friendUserId={entry} onRemove={() => handleRemoveFriend(entry)} /></li>))}</ul>
+                (<li key={entry}><Friends friendUserId={entry} onRemove={() => handleRemoveFriend(entry)} onViewProfile={() => handleViewFriend(entry)} /></li>))}</ul>
             <h2>Incoming Requests:</h2>
             <ul> {incomingRequests.map((entry, index) => 
                 (<li key={entry.id}><IncomingRequest fromUserId={entry.fromUserId} onAccept={() => handleAccept(entry.id, entry.fromUserId)} onReject={() => handleReject(entry.id)}/></li>))}</ul>
