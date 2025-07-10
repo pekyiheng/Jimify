@@ -9,7 +9,6 @@
 .app {
   width:100%;
   flex: 1;
-  border: solid black;
   padding: 20px;
   
 }
@@ -168,6 +167,7 @@
   border: solid;
   padding: 10px;
   background: rgb(37, 37, 37);
+  color: white;
 }
 
 .OrLineBreak > hr {

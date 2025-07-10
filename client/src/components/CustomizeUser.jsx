@@ -114,8 +114,8 @@ const CustomizeUser = () => {
 
     return (
         <>
-            <button onClick={toggleDialog}>Edit profile</button>
-            <dialog ref={dialogRef}>
+            <button id='edit-profile-button' onClick={toggleDialog}>Edit profile</button>
+            <dialog id='customize-user-dialog' ref={dialogRef}>
                 <header className='registerHeader'>
                     <h2>Edit profile </h2>
                 </header>
