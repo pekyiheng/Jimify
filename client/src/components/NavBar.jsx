@@ -8,6 +8,8 @@ const NavBar = () => {
             <Link to="trainingPage">Training</Link>
             <span className="divider"></span>
             <Link to="friendsPage">Friends</Link>
+            <span className="divider"></span>
+            <Link to="myProfilePage">My Profile</Link>
         </div>
     )
 }

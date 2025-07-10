@@ -88,6 +88,11 @@ const WeightPage = () => {
         const entry = {
             value, time, ...(imageUrl && { imageUrl })
         };
+
+        const activityEntry = {
+            note: "User weight updated to " + value + "kg",
+            time
+        }
             
         console.log("submitting entry:", entry);
 
@@ -98,17 +103,26 @@ const WeightPage = () => {
                 //updates weight in user document
                 updateUserWeightField(value);
                 //updates weight in user weight collection
-                setDoc(userWeightDocRef, entry);
+                await setDoc(userWeightDocRef, entry);
                 console.log("Successfully added to Firestore:", docId);
                 setWeight([...oldWeight, { ...entry, id: docId }]);
                 setNewWeight("");
                 setImageFile(null);
+
+                const userActivityDocRef = doc(db, "Users", userId, "Activity_Log", docId);
+                await setDoc(userActivityDocRef, activityEntry);
             } catch (err) {
                 console.error("Error adding weight:", err);
             }
     }
 
     const handleDeleteWeight = async (id) => {
+        const time = new Date();
+        const activityEntry = {
+            note: "User weight entry deleted",
+            time
+        }
+        
         try {
             await deleteDoc(doc(db, "Users", userId, "User_Weight", id));
             const updatedWeights = oldWeight.filter((entry) => entry.id !== id);
@@ -116,6 +130,10 @@ const WeightPage = () => {
             console.log(newLatestWeight)
             updateUserWeightField(newLatestWeight);
             setWeight(updatedWeights);
+            
+            const docId = Date.now().toString();
+            const userActivityDocRef = doc(db, "Users", userId, "Activity_Log", docId);
+            await setDoc(userActivityDocRef, activityEntry);
         } catch (err) {
             console.error("Error deleting weight:", err);
         }

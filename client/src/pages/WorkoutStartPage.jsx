@@ -123,6 +123,11 @@ const WorkoutStartPage = () => {
                 time: time,
                 exp: expInc
         };
+
+        const activityEntry = {
+            note: `Workout '${workoutName}' logged`,
+            time
+        }
             
         console.log("submitting entry:", entry);
 
@@ -131,6 +136,9 @@ const WorkoutStartPage = () => {
             const userWorkoutDocRef = doc(db, "Users", userId, "User_Workout", docId);
             const docRef = await setDoc(userWorkoutDocRef, entry);
             console.log("Successfully added to Firestore:", docId);
+
+            const userActivityDocRef = doc(db, "Users", userId, "Activity_Log", docId);
+            await setDoc(userActivityDocRef, activityEntry);
         } catch (err) {
             console.error("Error adding workout:", err);
         }

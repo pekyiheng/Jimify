@@ -203,7 +203,12 @@ const TrainingPage = () => {
             exercises: selectedExercises,
             time,
         };
-            
+
+        const activityEntry = {
+            note: `Workout plan '${workoutPlanName}' created`,
+            time
+        }
+
         console.log("submitting entry:", entry);
 
         try {
@@ -215,6 +220,9 @@ const TrainingPage = () => {
             setWorkoutPlanName("");
             setSelectedExercises([]);
             setShowWorkoutPlanForm(false);
+
+            const userActivityDocRef = doc(db, "Users", userId, "Activity_Log", docId);
+            await setDoc(userActivityDocRef, activityEntry);
         } catch (err) {
             console.error("Error adding workout plan:", err);
         }
@@ -236,10 +244,22 @@ const TrainingPage = () => {
     }
 
     const handleDeleteWorkoutPlan = async (id) => {
+        const time = new Date();
+        const workoutPlan = oldWorkoutPlan.find((entry) => entry.id === id);
+        const workoutPlanName = workoutPlan.workoutName;
+        const activityEntry = {
+            note: `Workout plan '${workoutPlanName}' deleted`,
+            time
+        } 
+
         try {
             await deleteDoc(doc(db, "Users", userId, "User_Workout_Plan", id));
             const updatedWorkoutPlan = oldWorkoutPlan.filter((entry) => entry.id !== id);
             setWorkoutPlan(updatedWorkoutPlan);
+
+            const docId = Date.now().toString();
+            const userActivityDocRef = doc(db, "Users", userId, "Activity_Log", docId);
+            await setDoc(userActivityDocRef, activityEntry);
         } catch (err) {
             console.error("Error deleting workout plan:", err);
         }
@@ -283,6 +303,11 @@ const TrainingPage = () => {
                 time: time,
                 exp: expInc
         };
+
+        const activityEntry = {
+            note: `Workout '${workoutPlanForLogging}' logged`,
+            time
+        } 
             
         console.log("submitting entry:", entry);
 
@@ -295,6 +320,9 @@ const TrainingPage = () => {
             setWorkoutForLogging([]);
             setWorkoutPlanForLogging("");
             setShowWorkoutForm(false);
+
+            const userActivityDocRef = doc(db, "Users", userId, "Activity_Log", docId);
+            await setDoc(userActivityDocRef, activityEntry);
         } catch (err) {
             console.error("Error adding workout:", err);
         }
@@ -311,12 +339,24 @@ const TrainingPage = () => {
 
     const handleDeleteWorkout = async (id) => {
         
-        const exp = oldWorkout.find((entry) => entry.id == id).exp;
+        const workout = oldWorkout.find((entry) => entry.id == id);
+        const exp = workout.exp;
+
+        const time = new Date();
+        const workoutName = workout.workout;
+        const activityEntry = {
+            note: `Workout '${workoutName}' deleted`,
+            time
+        } 
 
         try {
             await deleteDoc(doc(db, "Users", userId, "User_Workout", id));
             const updatedWorkout = oldWorkout.filter((entry) => entry.id !== id);
             setWorkout(updatedWorkout);
+            
+            const docId = Date.now().toString();
+            const userActivityDocRef = doc(db, "Users", userId, "Activity_Log", docId);
+            await setDoc(userActivityDocRef, activityEntry);
         } catch (err) {
             console.error("Error deleting workout:", err);
         }

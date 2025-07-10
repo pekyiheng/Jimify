@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import '../App.css';
 import { auth } from '../firebase_config';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
 
@@ -18,7 +18,16 @@ const RegisterPage = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            await createUserWithEmailAndPassword(auth, email, password);
+            const userCred = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCred.user;
+
+            await sendEmailVerification(user)
+                .then(() => {
+                    alert("Verification email sent. Please check your inbox.");
+                })
+                .catch((e) => {
+                    console.error("Error sending verification email: ", e.errorMessage);
+                });
             navigate("/loginPage");
         }
         catch (e) {
@@ -47,7 +56,7 @@ const RegisterPage = () => {
             <h2>Register</h2>
             <form onSubmit={handleSubmit}>
                 <div className="inputContainer">
-                    <input type="text" placeholder="Email" className="input" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                    <input type="email" placeholder="Email" className="input" value={email} onChange={(e) => setEmail(e.target.value)}/>
                     <FaUser className="loginIcon"/>
                 </div>
 
