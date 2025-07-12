@@ -3,12 +3,18 @@ import { getDoc, updateDoc, setDoc, deleteField, doc, increment } from "firebase
 import { db, auth } from "../firebase_config"
 import { onAuthStateChanged } from "firebase/auth";
 import Popup from 'reactjs-popup';
-import { useUser } from "../UserContext";
+import { extractCalories } from '../helper';
+import axios from 'axios';
 
 const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
     const [foodList, setFoodList] = useState([]);
     const [newFood, setNewFood] = useState("");
     const [newCal, setNewCal] = useState(0);
+    const [selectedFoodCalValue, setSelectedFoodCalValue] = useState(0);
+    const [servingSizeGram, setServingSizeGram] = useState(0);
+    const [servingSizePerc, setServingSizePerc] = useState(100);
+    const [searchedFoodList, setSearchedFoodList] = useState([]);
+    const [boolCustomFood, setBoolCustomFood] = useState(false);
     const [showErr, setShowErr] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
@@ -37,13 +43,41 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
         }
     }
 
-    const handleNewCalChange = (e) => {
+    const handleSearch = async (userInput) => {
 
-        if (e.target.value < 0) {
+        if (userInput == '') {
+            return;
+        }
+
+        try {
+          console.log(userInput)
+          const response = await axios.get(`/api/fatsecret/searchFood?q=${userInput}`);
+          if (response.data.length > 0) {
+            setSearchedFoodList(response.data);
+          }
+        } catch (error) {
+          console.error("Error fetching food list:", error);
+        }
+      };
+
+      const handleSelectItem = (foodID) => {
+        const foodObj = searchedFoodList.filter(foodItem => foodItem['food_id'] == foodID)
+        setNewFood(foodObj[0]['food_name']);
+        const food_description = foodObj[0]['food_description'];
+        setServingSizePerc(100); 
+        setSelectedFoodCalValue(extractCalories(food_description));
+        handleNewCalChange(extractCalories(food_description));
+             
+      }
+
+    const handleNewCalChange = (newCalValue) => {
+
+        if (newCalValue < 0) {
             setNewCal(0);
         } else {
             setShowErr(false);
-            setNewCal(e.target.value);
+            const newCalVal = servingSizePerc / 100 * newCalValue;
+            setNewCal(Math.round(newCalVal));
         }
         
     }
@@ -62,7 +96,7 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
 
         if (isNaN(calToAdd) || calToAdd < 0) {
             setErrorMessage("Please enter a valid calorie value");
-            setShowErr(true);
+            setShowErr(true)    ;
             return;
         }
         
@@ -105,7 +139,30 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
             console.error("Error deleting food item:", error);
         }
     }
+
+    const handleCustomFoodBtn = () => {
+        setBoolCustomFood(!boolCustomFood);
+        setNewCal(0);
+        setNewFood('');
+    }
     
+    const handleNewServingChange = (e) => {
+        const newServingValue = parseInt(e.target.value, 10);
+        setServingSizePerc(newServingValue);
+        const newCalVal = e.target.value / 100 * selectedFoodCalValue;
+        setNewCal(Math.round(newCalVal));
+    }
+
+    const closePopup = () => {
+        setBoolCustomFood(false);
+        setShowErr(false);
+        setNewCal(0);
+        setNewFood('');
+        setSelectedFoodCalValue(0);
+        setServingSizePerc(100);
+        setSearchedFoodList([]);
+    }
+
     return (
         <div className="addfood">
             <h3>{mealType}</h3>
@@ -120,19 +177,48 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
                 ))}
             </ul>
             <div>
-                <Popup trigger={<button> + Add food </button>} onClose={() => setShowErr(false)}>
+                <Popup trigger={<button> + Add food </button>} onClose={closePopup}>
                     <div className='AddFoodPopup'>
                         <form onSubmit={handleAddFood}>
-                            <div id='food'>
-                                <label>Food</label>
-                                <input name='foodItem' type='text' onChange={(e) => setNewFood(e.target.value)}></input>
-                            </div>
-                            <div>
-                                <label>Cal</label>
-                                <input name='caloriesVal' type='number' placeholder='0' value={newCal} onChange={handleNewCalChange}></input>
-                            </div>
+                            {!boolCustomFood && (
+                                <div id='useAPI'>
+                                    <div id='searchFood'>
+                                        <label>Search Food</label>
+                                        <input name='foodItem' type='text' value={newFood} onChange={(e) => {setNewFood(e.target.value);handleSearch(e.target.value)}}>
+                                        </input>
+                                        <select onChange={e => handleSelectItem(e.target.value)}>
+                                            {searchedFoodList.map((foodItem) => (
+                                                <option key={foodItem['food_id']} value={foodItem['food_id']}>{foodItem['food_name'] + " " + foodItem['food_description']}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div> 
+                                        <p>Calories: {newCal} kcal</p>
+                                        <label>Serving Size </label>
+                                        <input type='range' min='0' max='100' value={servingSizePerc.toString()} onChange={handleNewServingChange}></input>
+                                    </div>
+                                </div>
+                            )}
+                            {boolCustomFood && (
+                                <div id='customFood'>
+                                    <div id='food'>
+                                        <label>Food</label>
+                                        <input name='foodItem' type='text' onChange={(e) => setNewFood(e.target.value)}></input>
+                                    </div>
+                                    <div>
+                                        <label>Cal</label>
+                                        <input name='caloriesVal' type='number' placeholder='0' value={newCal} onChange={e => handleNewCalChange(e.target.value)}></input>
+                                    </div>
+                                </div>
+                            )}
+                            
                             <br></br>
                             <button type='submit'>Add</button>
+                            <button type='button' onClick={handleCustomFoodBtn}>
+                                {boolCustomFood && ("Cancel")}
+                                {!boolCustomFood && ("Custom Food")}
+                                
+                            </button>
                             {showErr && <p className='invalidFields'>{errorMessage}</p>}
                         </form>
                     </div>

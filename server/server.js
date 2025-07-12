@@ -1,7 +1,7 @@
 const express = require("express");
+require('dotenv').config();
 const app = express();
-const loginRouter = require("./routes/loginRoutes");
-const registerRouter = require("./routes/registerRoutes");
+const fatsecretRoutes = require('./routes/fatsecretRoutes');
 const cors = require("cors");
 const corsOptions = {
     origin: ["http://localhost:5173"],
@@ -10,8 +10,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-app.use("/login", loginRouter);
-app.use("/register", registerRouter);
+app.use('/api/fatsecret', fatsecretRoutes);
+
 
 app.get("/", (req, res) => {
     res.json({weight : "62"})

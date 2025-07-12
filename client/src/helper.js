@@ -63,4 +63,23 @@ function getActivityLevel(activity) {
   }
 }
 
-export { formatDateToYYYYMMDD, formatDateToDDMMYYYY, calculateBMR, getGoal, getActivityLevel };
+function extractCalories(nutritionFactsString) {
+  const regex = /Calories: (\d+)kcal/;
+  const match = nutritionFactsString.match(regex);
+  if (match && match[1]) {
+    return parseInt(match[1], 10);
+  }
+  return null;
+}
+
+// function extractServingSize(nutritionFactsString) {
+//   const regex = /Per (\d+)g/;
+//   console.log(nutritionFactsString)
+//   const match = nutritionFactsString.match(regex);
+//   if (match && match[1]) {
+//     return parseInt(match[1], 10);
+//   }
+//   return null;
+// }
+
+export { formatDateToYYYYMMDD, formatDateToDDMMYYYY, calculateBMR, getGoal, getActivityLevel, extractCalories };
