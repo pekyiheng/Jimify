@@ -51,7 +51,7 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
 
         try {
           console.log(userInput)
-          const response = await axios.get(`/api/fatsecret/searchFood?q=${userInput}`);
+          const response = await axios.get(`https://api-tptl253ghq-uc.a.run.app/fatsecret/searchFood?q=${userInput}`);
           if (response.data.length > 0) {
             setSearchedFoodList(response.data);
           }
