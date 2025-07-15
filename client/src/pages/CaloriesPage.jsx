@@ -1,3 +1,4 @@
+import React from 'react';
 import AddFood from "../components/AddFood";
 import { formatDateToYYYYMMDD } from "../helper";
 import { useState, useEffect } from "react";

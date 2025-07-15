@@ -20,6 +20,28 @@ const WorkoutStartPage = () => {
     const [timer, setTimer] = useState(0);
     const [resting, setResting] = useState(false);
 
+    //check if timer is running
+    useEffect (() => {
+        const endTime = localStorage.getItem('restTimerEndTime');
+        const setNum = localStorage.getItem("setNumber");
+        if (setNum) {
+            console.log(setNum);
+            setSetnumber(parseInt(setNum));
+        }
+        if (endTime) {
+            const timeRemaining = Math.max(0, Math.round((parseInt(endTime) - Date.now()) / 1000));
+            if (timeRemaining > 0) {
+                setTimer(timeRemaining);
+                setResting(true);
+            } else {
+                localStorage.removeItem('restTimerEndTime');
+                setTimer(0);
+                setResting(false);
+            }
+        }
+
+    }, []);
+
     useEffect(() => {
         if (exercises.length > 0) {
             setWorkoutForLogging(exercises.map(ex => ({
@@ -43,6 +65,7 @@ const WorkoutStartPage = () => {
             return () => clearInterval(interval);
         } else if (resting && timer <= 0) {
             setResting(false);
+            localStorage.removeItem('restTimerEndTime');
         }
     }, [resting, timer])
     
@@ -75,6 +98,7 @@ const WorkoutStartPage = () => {
             updated[exerciseIndex].sets = setNumber;
             setWorkoutForLogging(updated);
             setSetnumber(setNumber + 1);
+            localStorage.setItem('setNumber', (setNumber + 1).toString());
             startRest(currentExercise.restMinutes, currentExercise.restSeconds);
         } else if (setNumber === currentExercise.expectedSets && exerciseIndex < exercises.length - 1) {
             const updated = [...workoutForLogging];
@@ -92,6 +116,8 @@ const WorkoutStartPage = () => {
 
     const startRest = (min, sec) => {
         const totalSeconds = (min || 0) * 60 + (sec || 0);
+        const endTime = Date.now() + totalSeconds * 1000;
+        localStorage.setItem('restTimerEndTime', endTime.toString());
         setTimer(totalSeconds);
         setResting(true);
     }
@@ -108,6 +134,11 @@ const WorkoutStartPage = () => {
     
     const handleFinish = async (e) => {
         e.preventDefault();
+        localStorage.removeItem('restTimerEndTime');
+        localStorage.removeItem('setNumber');
+        setResting(false);
+        setTimer(0);
+        
         const time = new Date();
         const userWeight = oldWeight[oldWeight.length-1]?.value ?? 100; // use 100kg to calculate exp if weight not logged
         const expInc = workoutForLogging.map(ex => {
@@ -182,7 +213,10 @@ const WorkoutStartPage = () => {
                     <p>Set {setNumber} of {currentExercise.expectedSets}</p>
 
                     {resting ? (
-                        <p>Rest time left: {Math.floor(timer / 60)} : {String(timer % 60).padStart(2, "0")}</p>
+                        <div id="restingState">
+                            <p>Rest time left: {Math.floor(timer / 60)} : {String(timer % 60).padStart(2, "0")}</p>
+                            <button onClick={() => setResting(false)}>End timer</button>
+                        </div>
                     ) : (
                         <button className="button" onClick={handleSetComplete}>Set Completed</button>
                     )}

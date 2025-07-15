@@ -24,8 +24,8 @@
     "reactjs-popup": "^2.0.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.27.7",
-    "@babel/preset-env": "^7.27.2",
+    "@babel/core": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
     "@babel/preset-react": "^7.27.1",
     "@eslint/js": "^9.25.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -33,7 +33,7 @@
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",
-    "babel-jest": "^30.0.2",
+    "babel-jest": "^30.0.4",
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
@@ -46,8 +46,11 @@
   },
   "jest": {
     "transform": {
-      "^.+\\.[jt]sx?$": "babel-jest"
+      "^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": "babel-jest"
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@testing-library)/)"
+    ],
     "moduleNameMapper": {
       "\\.(css|less|sass|scss)$": "identity-obj-proxy",
       "\\.(gif|ttf|eot|svg|png)$": "<rootDir>/__mocks__/fileMock.js"
@@ -55,6 +58,10 @@
     "setupFilesAfterEnv": [
       "<rootDir>/jest-setup.js"
     ],
+    "extensionsToTreatAsEsm": [".jsx"],
+    "globals": {
+      "import.meta.env.VITE_FIREBASE_API_KEY": "test-firebase-api-key"
+    },
     "testEnvironment": "jsdom"
   }
 }
