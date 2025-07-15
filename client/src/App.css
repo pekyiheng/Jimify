@@ -185,3 +185,10 @@
 .OrLineBreak > span {
   flex-grow: 0.25;
 }
+
+#AI_Scanner_ctn {
+  position: fixed;
+  width: 100%;
+  padding-bottom: 50px;
+  bottom: 0;
+}
