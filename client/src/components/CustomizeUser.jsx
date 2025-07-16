@@ -151,8 +151,8 @@ const CustomizeUser = () => {
                             <option value="very active">Very active</option>
                         </select>
                         <h4>Current weight: {weight} kg</h4>
-                        <button type='button' onClick={toggleDialog}>Close</button>
                         <input type='submit' value="Save" className='button' ></input>
+                        <button type='button' onClick={toggleDialog}>Close</button>
                     </form>
                     <p>Daily calories goal: {dailyCalories}</p>
                 </div>

@@ -1,11 +1,11 @@
 import React from 'react';
 import AddFood from "../components/AddFood";
+import Spinner from '../components/Spinner';
 import { formatDateToYYYYMMDD } from "../helper";
 import { useState, useEffect, useRef } from "react";
 import { getDoc, doc, } from "firebase/firestore";
 import { db, model } from "../firebase_config"
 import { useUser } from "../UserContext";
-
 
 const CaloriesPage = () => {
     const [totalCalories, setTotalCalories] = useState(0);
@@ -13,8 +13,11 @@ const CaloriesPage = () => {
     const [imageFile, setImageFile] = useState(null);
     const [showDialog, setShowDialog] = useState(false);
     const [showErr, setShowErr] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("Please select an image")
+    const [loading, setLoading] = useState(false)
     const [aiResponse, setAiResponse] = useState('');
     const dialogRef = useRef(null);
+    const fileInputRef = useRef(null);
     const { userId } = useUser();
 
     useEffect(() => {
@@ -31,24 +34,32 @@ const CaloriesPage = () => {
 
     const promptAI = async () => {
         if (imageFile === null) {
+            setErrorMessage("Please select an image")
             setShowErr(true);
             return;
         }
 
-        const prompt = "Can you estimate how much calories is in the food? Give me a definite number."
-        
-        const imagePart = await fileToGenerativePart(imageFile);
-        console.log("prompting...")
-  
-    // To generate text output, call generateContent with the text and image
-        const result = await model.generateContent([prompt, imagePart]);
-  
-        const response = result.response;
-        const text = response.text();
-        setAiResponse(text);
+        const prompt = "Can you estimate how much calories is in the food? Your response should be in this format. A brief breakdown of the food present, and a new line stating total calories"
+        setLoading(true);
+
+        try {
+            const imagePart = await fileToGenerativePart(imageFile);
+            const result = await model.generateContent([prompt, imagePart]);
+            const response = result.response;
+            const text = response.text();
+            setAiResponse(text);
+        }
+        catch (e) {
+            setErrorMessage("An error occured. Please try again.")
+            setShowErr(true);
+            console.error(e);
+            return;
+        }
+        finally {
+            setLoading(false);
+        }
     }
 
-    // Converts a File object to a Part object.
 async function fileToGenerativePart(file) {
     const base64EncodedDataPromise = new Promise((resolve) => {
       const reader = new FileReader();
@@ -89,19 +100,28 @@ async function fileToGenerativePart(file) {
         setShowDialog(false);
         setAiResponse('');
         setImageFile(null);
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
     }
 
 
     return (
         <div>            
-            <dialog ref={dialogRef}>
+            <dialog id='dialogBox' ref={dialogRef}>
                 <input 
                     type="file"
                     accept="image/*"
+                    ref={fileInputRef}
                     onChange={(e) => setImageFile(e.target.files[0])}
                 />
-                <p className='invalidFields'>{showErr ? "Please select an image" : ""}</p>
-                <p>{aiResponse}</p>
+                <p className='invalidFields'>{showErr ? errorMessage : ""}</p>
+                <Spinner isLoading={loading}></Spinner>
+                <div>
+                    {loading && <p>Loading...</p>}
+                    {aiResponse !== '' && <p>{aiResponse}</p>}
+                </div>
                 <button onClick={promptAI} >Scan with Gemini AI </button>
                 <button onClick={cancelAIDialog}>Cancel</button>
             </dialog>
@@ -109,7 +129,7 @@ async function fileToGenerativePart(file) {
                 <button onClick={() => setCurDate(new Date(curDate.setDate(curDate.getDate() - 1)))}>
                     &lt;
                 </button>
-                <p>{formatDateToYYYYMMDD(curDate)}</p>
+                <input type='Date' value={formatDateToYYYYMMDD(curDate)} onChange={(e) => setCurDate(new Date(e.target.value))}></input>
                 <button onClick={() => setCurDate(new Date(curDate.setDate(curDate.getDate() + 1)))}>
                     &gt;
                 </button>
