@@ -26,7 +26,7 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
         const userCaloriesDocRef = doc(db, "Users", uid, "User_Calories", curDate);
         try {
             const docSnap = await getDoc(userCaloriesDocRef);
-            if (docSnap.exists()) {
+            if (docSnap.exists) {
                 const Meal_Map = docSnap.data().Meal_Map[mealType];
             
                 const foodListTmp = [];

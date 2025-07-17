@@ -78,7 +78,7 @@ async function fileToGenerativePart(file) {
         try {
             const docSnap = await getDoc(userCaloriesDocRef);
             let newCalories = 0;
-            if (docSnap.exists()) {
+            if (docSnap.exists) {
                 const data = docSnap.data();
                 newCalories = data.totalCalories || 0;
             }
@@ -125,7 +125,11 @@ async function fileToGenerativePart(file) {
                 <button onClick={promptAI} >Scan with Gemini AI </button>
                 <button onClick={cancelAIDialog}>Cancel</button>
             </dialog>
-            <header className="caloriesDateNav">
+            <header >
+                <h2>Calories Tracker</h2>
+                
+            </header>
+            <div className="caloriesDateNav">
                 <button onClick={() => setCurDate(new Date(curDate.setDate(curDate.getDate() - 1)))}>
                     &lt;
                 </button>
@@ -133,7 +137,7 @@ async function fileToGenerativePart(file) {
                 <button onClick={() => setCurDate(new Date(curDate.setDate(curDate.getDate() + 1)))}>
                     &gt;
                 </button>
-            </header>
+            </div>
             <p>Calories: {totalCalories}</p>
             <AddFood mealType="Breakfast" curDate={formatDateToYYYYMMDD(curDate)} userId={userId} onFoodChange={handleFoodChange} />
             <AddFood mealType="Lunch" curDate={formatDateToYYYYMMDD(curDate)} userId={userId} onFoodChange={handleFoodChange} />
