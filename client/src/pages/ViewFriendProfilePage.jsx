@@ -98,10 +98,12 @@ const ViewFriendProfilePage = () => {
             <p>Activity Level: {activityLevel}</p>
             <p>Goal: {goal}</p>
             <h3>Activity Log for past week</h3>
-            <ul>
-                {activity.map((entry, index) => 
-                    (<li key={entry.id}><ActivityEntry activity={entry.note} time={entry.time}/></li>))}
-            </ul>
+            {activity.length == 0
+                ? (<p>Silent...</p>)
+                : (<ul>
+                    {activity.map((entry, index) => 
+                        (<li key={entry.id}><ActivityEntry activity={entry.note} time={entry.time}/></li>))}
+                </ul>)}
         </div>
     )
 }
