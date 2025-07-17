@@ -38,7 +38,7 @@ function App() {
       const docSnap = await getDoc(userDocRef);
       setUserId(uid);
       setLoadingAuth(false);
-      if (docSnap.exists() && docSnap.data().Username) {
+      if (docSnap.exists && docSnap.data().Username) {
         console.log("Username: " + docSnap.data().Username)
         setToOnboard(false);
         return;

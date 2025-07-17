@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, query, where } from "firebase/firestore";
 import { db } from "../firebase_config"
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
@@ -15,8 +15,17 @@ const WeightPage = () => {
     const { userId } = useUser();
     const [newWeight, setNewWeight] = useState("");
     const [imageFile, setImageFile] = useState(null);
-
+    const [showDialog, setShowDialog] = useState(false);
     const [showAllWeights, setShowAllWeights] = useState(false);
+    const dialogRef = useRef(null);
+
+    useEffect(() => {
+        if (showDialog) {
+            dialogRef.current.showModal();
+        } else {
+            dialogRef.current.close();
+        }
+    }, [showDialog]);
 
     const pastMonthWeights = () => {
         const now = new Date();
@@ -31,6 +40,8 @@ const WeightPage = () => {
     useEffect(() => {
         fetchWeights(userId);
     }, [])
+
+
 
     const fetchWeights = async (uid) => {
         const userWeightColRef = collection(db, "Users", uid, "User_Weight");
@@ -111,6 +122,7 @@ const WeightPage = () => {
 
                 const userActivityDocRef = doc(db, "Users", userId, "Activity_Log", docId);
                 await setDoc(userActivityDocRef, activityEntry);
+                setShowDialog(false);
             } catch (err) {
                 console.error("Error adding weight:", err);
             }
@@ -141,12 +153,16 @@ const WeightPage = () => {
     
     function WeightEntry({ weight, time, imageUrl, onDelete }) {
         return (
-            <div>
-                <h3>{weight} KG</h3>
-                <p>{time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
+            <>
+                <div className="weight_details_ctn">
+                    <h3 className="weight_details">{weight} KG</h3>
+                    <p className="weight_details">{time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
+                </div>
                 {imageUrl && <img src={imageUrl} alt="Progress" width="150px" style={{ borderRadius: "10px" }}/>}
-                <button onClick={onDelete}>Delete</button>
-            </div>
+                <div className="delete_btn_weight">
+                    <button onClick={onDelete}>Delete</button>
+                </div>
+            </>
         );
     }
 
@@ -177,17 +193,16 @@ const WeightPage = () => {
         <div className="weightContainer">
             {oldWeight.length > 0 ? (
                 <>
-                <h1>Current Weight: {oldWeight[oldWeight.length - 1].value} KG</h1>
-                <h2>Last Updated: {oldWeight[oldWeight.length - 1].time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</h2>
+                <h2 className="no_margin">Current Weight: {oldWeight[oldWeight.length - 1].value} KG</h2>
+                <p>Last Updated: {oldWeight[oldWeight.length - 1].time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
                 </>)
                 : <h2>No Entries Yet</h2>
             }
 
-            <div className="chartContainer">
+            <div className="widgets">
                 <Line data={chartData} options={chartOptions} />
             </div>
-            
-            <div>
+            <dialog ref={dialogRef}>
                 <input 
                     type="number"
                     placeholder="Enter Weight (KG)"
@@ -200,13 +215,21 @@ const WeightPage = () => {
                     onChange={(e) => setImageFile(e.target.files[0])}
                 />
                 <button onClick={handleNewWeight} disabled={!newWeight}>Submit Weight Entry</button>
+                <button onClick={() => setShowDialog(false)}>Close</button>
+            </dialog>
+            
+            <div id="myEntries">
+                <h1>My Entries</h1>
+                <button onClick={() => setShowDialog(true)}>+ New weight</button>
                 <button onClick={() => setShowAllWeights(!showAllWeights)}>{showAllWeights ? "Show entries for the past month" : "Show all entries"}</button>
             </div>
 
             <div className="weightHistoryContainer">
                 <ul className="verticalListOfBoxes">
                     {reversedWeights.map((entry, index) => 
-                        (<li className="listItemInBox" key={entry.id}><WeightEntry weight={entry.value} time={entry.time} imageUrl={entry.imageUrl} onDelete={() => handleDeleteWeight(entry.id)}/></li>))}
+                        (<li className="listItemInBox" key={entry.id}>
+                            <WeightEntry weight={entry.value} time={entry.time} imageUrl={entry.imageUrl} onDelete={() => handleDeleteWeight(entry.id)}/>
+                        </li>))}
                 </ul>
             </div>
         </div>

@@ -16,6 +16,13 @@
   align-self: self-start;
   margin: 10px;
 }
+.delete_btn_weight {
+  margin-left: auto; 
+  align-content: center;
+}
+#myEntries {
+  text-align: left;
+}
 .widgets {
   box-sizing: border-box;
   border: solid gray;
@@ -52,11 +59,15 @@
   margin: 10px;
 }
 .horizontalListOfBoxes {
-  list-style-type: none;
   display: flex;
+  list-style-type: none;
+  width: 100%; 
+  max-width: 800px; 
+  white-space: nowrap;
   column-gap: 10px;
   align-items: center;
   padding: 0;
+  overflow-x: auto;
 }
 .verticalListOfBoxes {
   list-style-type: none;
@@ -67,13 +78,18 @@
   padding: 0;
 }
 .listItemInBox {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
   background-color:cornsilk;
   padding: 10px;
   border: 1px solid black;
   border-radius: 20px;
   text-align: center;
-  width: fit-content;
+  max-width:450px;
+  width: 100%;
   margin: 0 auto;
+  padding: 15px;
 }
 #userNotFoundMessage, #userExists, .invalidFields{
   color: red;
@@ -111,7 +127,6 @@
 .weightContainer {
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 .chartContainer {
   margin: 20px;
@@ -141,6 +156,14 @@
 }
 .weightHistoryContainer {
   width: 100%;
+}
+.weight_details_ctn {
+  margin: 0px 30px 0px 0px;
+  align-content: center;
+  text-align: left;
+}
+.weight_details {
+  margin: 0
 }
 .spacingBelow {
   margin-bottom: 1rem; 
@@ -196,7 +219,7 @@ dialog::backdrop {
   opacity: 0.2;
   background-color: gray;
 }
-input[type="date"] {
+.caloriesDateNav > input[type="date"] {
   border-style: solid;
   border-radius: 10%;
   border-color: lightgray;
