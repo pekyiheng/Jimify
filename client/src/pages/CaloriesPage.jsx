@@ -125,8 +125,9 @@ async function fileToGenerativePart(file) {
                 <button onClick={promptAI} >Scan with Gemini AI </button>
                 <button onClick={cancelAIDialog}>Cancel</button>
             </dialog>
-            <header>
-                <h2>Calories Tracker</h2>
+            
+            <header className='nutritionHeader'>
+                <h2 id='title'>Calories Tracker</h2>
             </header>
             <div className="caloriesDateNav">
                 <button onClick={() => setCurDate(new Date(curDate.setDate(curDate.getDate() - 1)))}>

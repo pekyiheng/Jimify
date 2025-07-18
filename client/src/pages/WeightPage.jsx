@@ -199,7 +199,7 @@ const WeightPage = () => {
                 : <h2 className="no_margin">No Entries Yet</h2>
             }
 
-            <div className="widgets">
+            <div className="widgets" id="weightWidget">
                 <Line data={chartData} options={chartOptions} />
             </div>
             <dialog ref={dialogRef}>

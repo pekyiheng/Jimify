@@ -277,7 +277,7 @@ const TrainingPage = () => {
 
     function WorkoutPlan({ name, exercise, startWorkout, onDelete }) {
         return (
-            <div>
+            <div id="myWorkoutCtn">
                 <h3>{name}</h3>
                 {exercise}
                 <button onClick={startWorkout} className="button">Start Workout</button>

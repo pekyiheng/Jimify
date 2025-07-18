@@ -17,16 +17,16 @@ const CaloriesWidget = ({totalCalories, dailyCaloriesGoal}) => {
       });
 
     return (
-        <div style={{ width: 200, height: 200, justifyContent: 'space-around'  }}>
+        <div className='caloriesWidget'>
             <h2>Calories</h2>
             <div style={{ height: 120, paddingLeft: '30px', paddingRight: '30px' }}>
-            <CircularProgressbarWithChildren value={percentage} styles={circleStyles}>
-                <div>
-                    <h3>
-                        {percentage}%
-                    </h3>
-                </div>
-            </CircularProgressbarWithChildren>
+                <CircularProgressbarWithChildren value={percentage} styles={circleStyles}>
+                    <div>
+                        <h3>
+                            {percentage}%
+                        </h3>
+                    </div>
+                </CircularProgressbarWithChildren>
             </div>
         </div>
      );

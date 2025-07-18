@@ -27,6 +27,7 @@
   box-sizing: border-box;
   border: solid gray;
   margin: 5px;
+  padding: 5px;
   border-width: 10px;
   min-height: 30vb;
   min-width: 30vb;
@@ -37,6 +38,24 @@
   align-items: center;
   text-align: center;
 }
+.widgets a{
+  justify-content: center;
+  display: block;
+  width: 100%;
+}
+.caloriesWidget {
+  display: block;
+  justify-self: center;
+  height:200px;
+  width: 200px;
+}
+.widgets#weightWidget {
+  height: 300px;
+}
+.nutritionHeader {
+  margin: 20px;
+}
+
 .navbar {
   display: flex;
   justify-content: center;
@@ -63,6 +82,7 @@
   list-style-type: none;
   width: 100%; 
   max-width: 800px; 
+  height: 330px;
   white-space: nowrap;
   column-gap: 10px;
   align-items: center;
@@ -90,6 +110,11 @@
   width: 100%;
   margin: 0 auto;
   padding: 15px;
+}
+
+#myWorkoutCtn {
+  height: 270px;
+  overflow-y: auto;
 }
 #userNotFoundMessage, #userExists, .invalidFields{
   color: red;
