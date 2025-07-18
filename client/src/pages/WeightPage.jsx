@@ -155,8 +155,8 @@ const WeightPage = () => {
         return (
             <>
                 <div className="weight_details_ctn">
-                    <h3 className="weight_details">{weight} KG</h3>
-                    <p className="weight_details">{time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
+                    <h3 id="weight_details" className="no_margin" >{weight} KG</h3>
+                    <p id="weight_details" className="no_margin">{time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
                 </div>
                 {imageUrl && <img src={imageUrl} alt="Progress" width="150px" style={{ borderRadius: "10px" }}/>}
                 <div className="delete_btn_weight">
@@ -194,9 +194,9 @@ const WeightPage = () => {
             {oldWeight.length > 0 ? (
                 <>
                 <h2 className="no_margin">Current Weight: {oldWeight[oldWeight.length - 1].value} KG</h2>
-                <p>Last Updated: {oldWeight[oldWeight.length - 1].time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
+                <p className="no_margin">Last Updated: {oldWeight[oldWeight.length - 1].time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
                 </>)
-                : <h2>No Entries Yet</h2>
+                : <h2 className="no_margin">No Entries Yet</h2>
             }
 
             <div className="widgets">

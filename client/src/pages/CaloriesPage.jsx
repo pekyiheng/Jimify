@@ -141,8 +141,10 @@ async function fileToGenerativePart(file) {
             <AddFood mealType="Breakfast" curDate={formatDateToYYYYMMDD(curDate)} userId={userId} onFoodChange={handleFoodChange} />
             <AddFood mealType="Lunch" curDate={formatDateToYYYYMMDD(curDate)} userId={userId} onFoodChange={handleFoodChange} />
             <AddFood mealType="Dinner" curDate={formatDateToYYYYMMDD(curDate)} userId={userId} onFoodChange={handleFoodChange} />
-            <div id='AI_Scanner_ctn'>
-                <button onClick={() => setShowDialog(true)}>Scan with AI</button>
+            <div className='AI_Scanner_ctn'>
+                <div className='AI_Scanner_btn'>
+                    <button onClick={() => setShowDialog(true)}>Need help estimating calories? Ask Gemini</button>
+                </div>
             </div>
         </div>
     );

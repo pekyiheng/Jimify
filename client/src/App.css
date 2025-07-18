@@ -96,10 +96,14 @@
 }
 
 .buttonContainer {
+  margin: 1rem;
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
+}
+#training_log_ctn {
+  max-width: 300px;
 }
 .input {
   height: 100%;
@@ -162,7 +166,7 @@
   align-content: center;
   text-align: left;
 }
-.weight_details {
+.no_margin {
   margin: 0
 }
 .spacingBelow {
@@ -209,11 +213,26 @@
   flex-grow: 0.25;
 }
 
-#AI_Scanner_ctn {
+.AI_Scanner_ctn {
   position: fixed;
   width: 100%;
-  padding-bottom: 50px;
+  margin-bottom: 50px;
+  margin-right: 50px;
   bottom: 0;
+  align-self: flex-start;
+  justify-self: center;
+  justify-content: end;
+}
+.AI_Scanner_btn {
+  justify-self: end;
+}
+.hover-text {
+  visibility: hidden;
+  background-color: black;
+  color: white;
+  justify-self: end;
+  max-width: 100px;
+  padding: 5px;
 }
 dialog::backdrop {
   opacity: 0.2;

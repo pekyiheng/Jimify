@@ -371,20 +371,26 @@ const TrainingPage = () => {
     }
 
     function Workout({ name, exercises = [], time, onDelete }) {
+        const [showDetails, setShowDetails] = useState(false); 
         return (
             <div>
-                <h3>{name}</h3>
-                <p>Date of Workout: {time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
-                <ul className="listWithNoPointers">
-                    {exercises.map((ex, index) => (
-                        <li key={index} className="exerciseListItem">
-                            <h4>{ex.exercise}</h4>
-                            <p>Expected Weight: {ex.expectedWeight} | Actual: {ex.weight}</p>
-                            <p>Expected Sets: {ex.expectedSets} | Actual: {ex.sets}</p>
-                            <p>Expected Reps: {ex.expectedReps} | Actual: {ex.reps}</p>
-                        </li>
-                    ))}
-                </ul>
+                <h3 className="no_margin">{name}</h3>
+                <p className="no_margin">Date of Workout: {time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
+                {
+                    showDetails && (
+                        <ul className="listWithNoPointers">
+                            {exercises.map((ex, index) => (
+                                <li key={index} className="exerciseListItem">
+                                    <h4>{ex.exercise}</h4>
+                                    <p>Expected Weight: {ex.expectedWeight} | Actual: {ex.weight}</p>
+                                    <p>Expected Sets: {ex.expectedSets} | Actual: {ex.sets}</p>
+                                    <p>Expected Reps: {ex.expectedReps} | Actual: {ex.reps}</p>
+                                </li>
+                            ))}
+                        </ul>
+                    )
+                }
+                <button onClick={() => setShowDetails(!showDetails)}>Details</button>
                 <button onClick={onDelete} className="button">Delete</button>
             </div>
         );
@@ -508,9 +514,9 @@ const TrainingPage = () => {
                         (<li key={entry}><BodyPart name={entry} count={numberOfTimesHit[index]}/></li>))}
                     </ul>
                 </div>
-                <h2>{showAllWorkouts ? "All past workouts" : "Workouts in past week"}</h2>
+                <h2 className="no_margin">{showAllWorkouts ? "All past workouts" : "Workouts in past week"}</h2>
+                <p className="no_margin">Tip: Hitting your workout expectations grants extra EXP!</p>
                 <div className="buttonContainer">
-                    <p className="spacingBelow">Tip: Hitting your workout expectations grants extra EXP!</p>
                     <button onClick={() => setShowWorkoutForm(true)} className="button">+ Log Your Workout</button>
                     <button onClick={() => setShowAllWorkouts(!showAllWorkouts)} className="button">{showAllWorkouts ? "Show only past 7 days" : "Show all past workouts"}</button>
                 </div>
@@ -589,7 +595,9 @@ const TrainingPage = () => {
                         : pastSevenDaysWorkouts())
                         .sort((a, b) => b.time - a.time)
                         .map((entry, index) => 
-                        (<li className="listItemInBox" key={entry.id}><Workout name={entry.workout} exercises={entry.exercises} time={entry.time} onDelete={() => handleDeleteWorkout(entry.id)}/></li>))}
+                        (<li id="training_log_ctn" className="listItemInBox" key={entry.id}>
+                            <Workout name={entry.workout} exercises={entry.exercises} time={entry.time} onDelete={() => handleDeleteWorkout(entry.id)}/>
+                        </li>))}
                 </ul>
             </div>
         </div>
