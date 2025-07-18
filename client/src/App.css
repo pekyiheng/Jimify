@@ -16,10 +16,18 @@
   align-self: self-start;
   margin: 10px;
 }
+.delete_btn_weight {
+  margin-left: auto; 
+  align-content: center;
+}
+#myEntries {
+  text-align: left;
+}
 .widgets {
   box-sizing: border-box;
   border: solid gray;
   margin: 5px;
+  padding: 5px;
   border-width: 10px;
   min-height: 30vb;
   min-width: 30vb;
@@ -30,6 +38,24 @@
   align-items: center;
   text-align: center;
 }
+.widgets a{
+  justify-content: center;
+  display: block;
+  width: 100%;
+}
+.caloriesWidget {
+  display: block;
+  justify-self: center;
+  height:200px;
+  width: 200px;
+}
+.widgets#weightWidget {
+  height: 300px;
+}
+.nutritionHeader {
+  margin: 20px;
+}
+
 .navbar {
   display: flex;
   justify-content: center;
@@ -52,11 +78,16 @@
   margin: 10px;
 }
 .horizontalListOfBoxes {
-  list-style-type: none;
   display: flex;
+  list-style-type: none;
+  width: 100%; 
+  max-width: 800px; 
+  height: 330px;
+  white-space: nowrap;
   column-gap: 10px;
   align-items: center;
   padding: 0;
+  overflow-x: auto;
 }
 .verticalListOfBoxes {
   list-style-type: none;
@@ -67,23 +98,37 @@
   padding: 0;
 }
 .listItemInBox {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
   background-color:cornsilk;
   padding: 10px;
   border: 1px solid black;
   border-radius: 20px;
   text-align: center;
-  width: fit-content;
+  max-width:450px;
+  width: 100%;
   margin: 0 auto;
+  padding: 15px;
+}
+
+#myWorkoutCtn {
+  height: 270px;
+  overflow-y: auto;
 }
 #userNotFoundMessage, #userExists, .invalidFields{
   color: red;
 }
 
 .buttonContainer {
+  margin: 1rem;
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
+}
+#training_log_ctn {
+  max-width: 300px;
 }
 .input {
   height: 100%;
@@ -111,7 +156,6 @@
 .weightContainer {
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 .chartContainer {
   margin: 20px;
@@ -141,6 +185,14 @@
 }
 .weightHistoryContainer {
   width: 100%;
+}
+.weight_details_ctn {
+  margin: 0px 30px 0px 0px;
+  align-content: center;
+  text-align: left;
+}
+.no_margin {
+  margin: 0
 }
 .spacingBelow {
   margin-bottom: 1rem; 
@@ -186,17 +238,32 @@
   flex-grow: 0.25;
 }
 
-#AI_Scanner_ctn {
+.AI_Scanner_ctn {
   position: fixed;
   width: 100%;
-  padding-bottom: 50px;
+  margin-bottom: 50px;
+  margin-right: 50px;
   bottom: 0;
+  align-self: flex-start;
+  justify-self: center;
+  justify-content: end;
+}
+.AI_Scanner_btn {
+  justify-self: end;
+}
+.hover-text {
+  visibility: hidden;
+  background-color: black;
+  color: white;
+  justify-self: end;
+  max-width: 100px;
+  padding: 5px;
 }
 dialog::backdrop {
   opacity: 0.2;
   background-color: gray;
 }
-input[type="date"] {
+.caloriesDateNav > input[type="date"] {
   border-style: solid;
   border-radius: 10%;
   border-color: lightgray;

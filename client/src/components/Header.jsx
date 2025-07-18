@@ -32,6 +32,7 @@ const Header = ({toOnboard}) => {
                                 <button onClick={handleLogOut}>Sign out</button>
                             </>
             }
+            <hr></hr>
         </div>
     )
 }

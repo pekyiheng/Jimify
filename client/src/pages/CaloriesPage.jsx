@@ -78,7 +78,7 @@ async function fileToGenerativePart(file) {
         try {
             const docSnap = await getDoc(userCaloriesDocRef);
             let newCalories = 0;
-            if (docSnap.exists()) {
+            if (docSnap.exists) {
                 const data = docSnap.data();
                 newCalories = data.totalCalories || 0;
             }
@@ -125,7 +125,11 @@ async function fileToGenerativePart(file) {
                 <button onClick={promptAI} >Scan with Gemini AI </button>
                 <button onClick={cancelAIDialog}>Cancel</button>
             </dialog>
-            <header className="caloriesDateNav">
+            
+            <header className='nutritionHeader'>
+                <h2 id='title'>Calories Tracker</h2>
+            </header>
+            <div className="caloriesDateNav">
                 <button onClick={() => setCurDate(new Date(curDate.setDate(curDate.getDate() - 1)))}>
                     &lt;
                 </button>
@@ -133,13 +137,15 @@ async function fileToGenerativePart(file) {
                 <button onClick={() => setCurDate(new Date(curDate.setDate(curDate.getDate() + 1)))}>
                     &gt;
                 </button>
-            </header>
+            </div>
             <p>Calories: {totalCalories}</p>
             <AddFood mealType="Breakfast" curDate={formatDateToYYYYMMDD(curDate)} userId={userId} onFoodChange={handleFoodChange} />
             <AddFood mealType="Lunch" curDate={formatDateToYYYYMMDD(curDate)} userId={userId} onFoodChange={handleFoodChange} />
             <AddFood mealType="Dinner" curDate={formatDateToYYYYMMDD(curDate)} userId={userId} onFoodChange={handleFoodChange} />
-            <div id='AI_Scanner_ctn'>
-                <button onClick={() => setShowDialog(true)}>Scan with AI</button>
+            <div className='AI_Scanner_ctn'>
+                <div className='AI_Scanner_btn'>
+                    <button onClick={() => setShowDialog(true)}>Need help estimating calories? Ask Gemini</button>
+                </div>
             </div>
         </div>
     );

@@ -20,7 +20,7 @@ const NutritionPage = () => {
     const userCaloriesDocRef = doc(db, "Users", auth.currentUser.uid, "User_Calories", curDate);
     try {
       const caloriesDocSnap = await getDoc(userCaloriesDocRef);
-      if (caloriesDocSnap.exists()) {
+      if (caloriesDocSnap.exists) {
         setTotalCalories(caloriesDocSnap.data().totalCalories);
       } else {
         console.log("No such document!");
