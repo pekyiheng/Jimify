@@ -3,9 +3,11 @@ import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, updateDoc,
 import { db } from "../firebase_config"
 import { useUser } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
+import { VscAccount } from "react-icons/vsc";
 
 function Friends({ friendUserId, onRemove, onViewProfile }) {
     const [friendUsername, setFriendUsername] = useState("");
+    const [profilePicture, setProfilePicture] = useState("");
 
     useEffect(() => {
         const fetchFriendUsername = async () => {
@@ -13,6 +15,7 @@ function Friends({ friendUserId, onRemove, onViewProfile }) {
                 const docSnap = await getDoc(doc(db, "Users", friendUserId));
                 const data = docSnap.data();
                 setFriendUsername(data?.Username || "Unknown");
+                setProfilePicture(data.Profile_Picture || "");
             } catch (e) {
                 console.error(e);
                 return null;
@@ -23,9 +26,14 @@ function Friends({ friendUserId, onRemove, onViewProfile }) {
 
     return (
         <>
-            <p>{friendUsername}</p>
-            <button className="button" onClick={onRemove}>Remove friend</button>
-            <button className="button" onClick={onViewProfile}>View Profile</button>
+            {profilePicture 
+                ? (<img id="FriendEntryProfilePic" src={profilePicture} className="profilePicture"/>)
+                : (<VscAccount size={50}/>)}
+            <p id="friendName">{friendUsername}</p>
+            <div className="buttonContainerFriend">
+                <button className="button" onClick={onRemove}>Remove friend</button>
+                <button className="button" onClick={onViewProfile}>View Profile</button>
+            </div>
         </>
     )
 }
@@ -248,19 +256,21 @@ const FriendsPage = () => {
 
     return ( 
         <div>
+            <label>Add Friend: </label>
+            <input type="text" value={addFriend} onChange={(e) => setAddFriend(e.target.value)} placeholder="username"></input>
+            <button className="button" onClick={handleRequest} disabled={!addFriend}>Send Friend Request</button>
             <h2>Friends:</h2>
             <ul> {friends.map((entry, index) => 
-                (<li key={entry}><Friends friendUserId={entry} onRemove={() => handleRemoveFriend(entry)} onViewProfile={() => handleViewFriend(entry)} /></li>))}</ul>
+                (<li className="FriendEntry" key={entry}><Friends friendUserId={entry} onRemove={() => handleRemoveFriend(entry)} onViewProfile={() => handleViewFriend(entry)} /></li>))}
+            </ul>
             <h2>Incoming Requests:</h2>
             <ul> {incomingRequests.map((entry, index) => 
                 (<li key={entry.id}><IncomingRequest fromUserId={entry.fromUserId} onAccept={() => handleAccept(entry.id, entry.fromUserId)} onReject={() => handleReject(entry.id)}/></li>))}</ul>
             <h2>Outgoing Requests:</h2>
             <ul> {outgoingRequests.map((entry, index) => 
-                (<li key={entry.id}><OutgoingRequest toUserId={entry.toUserId}/></li>))}</ul>
-
-            <label>Add Friend: </label>
-            <input type="text" value={addFriend} onChange={(e) => setAddFriend(e.target.value)} placeholder="username"></input>
-            <button className="button" onClick={handleRequest} disabled={!addFriend}>Send Friend Request</button>
+                (<li key={entry.id}><OutgoingRequest toUserId={entry.toUserId}/></li>))}
+            </ul>
+            
         </div>
     )
 }

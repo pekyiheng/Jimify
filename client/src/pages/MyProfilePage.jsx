@@ -76,6 +76,7 @@ const MyProfilePage = () => {
     }
 
     const handleNewProfilePicture = async () => {
+        console.log(newProfilePicture);
         if (!newProfilePicture) {
             return;
         }
@@ -122,7 +123,7 @@ const MyProfilePage = () => {
                             onChange={(e) => setNewProfilePicture(e.target.files[0])}
                         />
                         <br/>
-                        <button onClick={() => handleNewProfilePicture} disabled={!newProfilePicture}>Upload profile picture</button>
+                        <button onClick={handleNewProfilePicture} disabled={!newProfilePicture}>Upload profile picture</button>
                     </div>)
                 : (<></>)}
             

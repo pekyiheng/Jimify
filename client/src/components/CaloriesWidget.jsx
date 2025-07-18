@@ -19,7 +19,7 @@ const CaloriesWidget = ({totalCalories, dailyCaloriesGoal}) => {
     return (
         <div className='caloriesWidget'>
             <h2>Calories</h2>
-            <div style={{ height: 120, paddingLeft: '30px', paddingRight: '30px' }}>
+            <div className='caloriesWidgetBar'>
                 <CircularProgressbarWithChildren value={percentage} styles={circleStyles}>
                     <div>
                         <h3>

@@ -29,8 +29,8 @@
   margin: 5px;
   padding: 5px;
   border-width: 10px;
-  min-height: 30vb;
-  min-width: 30vb;
+  height: 40vb;
+  width: 50vb;
   border-radius: 20px;
 
   display: flex;
@@ -40,14 +40,20 @@
 }
 .widgets a{
   justify-content: center;
-  display: block;
   width: 100%;
 }
 .caloriesWidget {
   display: block;
   justify-self: center;
-  height:200px;
-  width: 200px;
+  align-self: center;
+  height:100%;
+}
+.caloriesWidgetBar {
+  max-height: 60%;
+  max-width: 60%;
+  justify-self: center;
+  align-self: center;
+  margin:auto;
 }
 .widgets#weightWidget {
   height: 300px;
@@ -207,7 +213,6 @@
   border-radius: 50%;
 }
 
-
 .radio-button-container input[type="radio"] {
   display: none;
 }
@@ -287,4 +292,23 @@ dialog::backdrop {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+.FriendEntry {
+  list-style-type: none;
+  display: flex;
+  text-align: left;
+  align-content: center;
+  margin: 15px;
+}
+#friendName {
+  align-self: center;
+  margin:10px;
+}
+.buttonContainerFriend {
+  display: inline;
+  margin-left: auto;
+}
+#FriendEntryProfilePic {
+  height: 50px;
+  width: 50px;
 }
