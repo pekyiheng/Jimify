@@ -60,6 +60,26 @@ exports.weeklyBadgeCheck = onSchedule(
           await workoutWarriorBadgeRef.set({earnedOn: now}, {merge: true});
         }
       }
+
+      const babyStepsBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('baby_Steps');
+      const babyStepsBadgeSnap = await babyStepsBadgeRef.get();
+      if (!babyStepsBadgeSnap.exists) {
+        const userEXP = userDoc.exp;
+        const userLevel = Math.floor(Math.pow(exp / 100, 2/3));
+        if (userLevel >= 1) {
+          await babyStepsBadgeRef.set({earnedOn: now}, {merge: true});
+        }
+      }
+
+      const consistencyIsKingBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('consistency_Is_King');
+      const consistencyIsKingBadgeSnap = await consistencyIsKingBadgeRef.get();
+      if (!consistencyIsKingBadgeSnap.exists) {
+        const userEXP = userDoc.exp;
+        const userLevel = Math.floor(Math.pow(exp / 100, 2/3));
+        if (userLevel >= 10) {
+          await consistencyIsKingBadgeRef.set({earnedOn: now}, {merge: true});
+        }
+      }
     }
   }
 );
