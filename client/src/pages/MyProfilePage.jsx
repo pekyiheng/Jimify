@@ -21,6 +21,7 @@ const MyProfilePage = () => {
     const [changeProfilePicture, setChangeProfilePicture] = useState(false);
     const [newProfilePicture, setNewProfilePicture] = useState("");
     const [level, setLevel] = useState(0);
+    const [badges, setBadges] = useState([]);
 
     useEffect(() => {
         fetchActivity(userId);
@@ -56,6 +57,7 @@ const MyProfilePage = () => {
 
     const fetchDetails = async (uid) => {
         const userDocRef = doc(db, "Users", uid);
+        const userBadgesColRef = collection(db, "Users", uid, "User_Badges");
         
         try {
             const docSnap = await getDoc(userDocRef);
@@ -68,6 +70,29 @@ const MyProfilePage = () => {
             setUsername(data.Username);
             setProfilePicture(data.Profile_Picture || "");
             setLevel(Math.floor(Math.pow(data.exp / 100, 2/3)));
+
+            const userBadgesSnap = await getDocs(userBadgesColRef);
+            if (!userBadgesSnap.empty) {
+                const badgesColRef = collection(db, "Badges");
+
+                const userBadgesPromise = userBadgesSnap.docs.map(async (badge) => {
+                    const name = badge.id;
+                    const time = badge.data().earnedOn?.toDate ? badge.data().earnedOn.toDate() : badge.data().earnedOn;
+                    const badgeDocRef = doc(badgesColRef, name);
+                    const badgeDocSnap = await getDoc(badgeDocRef); 
+                    const imageUrl = badgeDocSnap.data().Picture;
+                    const description = badgeDocSnap.data().Description;
+                    return {
+                        name: name,
+                        time: time,
+                        imageUrl: imageUrl,
+                        description: description
+                    }
+                })
+
+                const userBadges = await Promise.all(userBadgesPromise);
+                setBadges(userBadges);
+            }
         }
         catch (e) {
             console.error(e);
@@ -134,6 +159,21 @@ const MyProfilePage = () => {
             <p>Height: {height}</p>
             <p>Activity Level: {activityLevel}</p>
             <p>Goal: {goal}</p>
+
+            <h3>My Badges</h3>
+            {badges.length == 0
+                ? (<p>No badges yet</p>)
+                : (<ul>
+                    {badges.map((entry, index) =>
+                        (<li key={entry.name} className="badgeItem">
+                            <div><img src={entry.imageUrl} className="profilePicture"/></div>
+                            <div className="rightContent">
+                                <h4>{entry.name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</h4>
+                                <p>Earned on: {entry.time.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"})}</p>
+                                <p>{entry.description}</p>
+                            </div>
+                        </li>))}
+                </ul>)}
             <h3>Activity Log for past week</h3>
             {activity.length == 0
                 ? (<p>Silent...</p>)
