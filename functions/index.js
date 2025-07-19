@@ -52,7 +52,7 @@ exports.weeklyBadgeCheck = onSchedule(
     for (const userDoc of usersSnap.docs) {
       const uid = userDoc.id;
       
-      const workoutWarriorBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('workout_Warrior');
+      const workoutWarriorBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('workout_warrior');
       const workoutWarriorBadgeSnap = await workoutWarriorBadgeRef.get();
       if (!workoutWarriorBadgeSnap.exists) {
         const workoutsSnap = await db.collection('Users').doc(uid).collection('User_Workout').where('time', '>=', oneWeekAgo).get();
@@ -61,7 +61,7 @@ exports.weeklyBadgeCheck = onSchedule(
         }
       }
 
-      const babyStepsBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('baby_Steps');
+      const babyStepsBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('baby_steps');
       const babyStepsBadgeSnap = await babyStepsBadgeRef.get();
       if (!babyStepsBadgeSnap.exists) {
         const userEXP = userDoc.data().exp;
@@ -71,7 +71,7 @@ exports.weeklyBadgeCheck = onSchedule(
         }
       }
 
-      const consistencyIsKingBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('consistency_Is_King');
+      const consistencyIsKingBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('consistency_is_king');
       const consistencyIsKingBadgeSnap = await consistencyIsKingBadgeRef.get();
       if (!consistencyIsKingBadgeSnap.exists) {
         const userEXP = userDoc.data().exp;
@@ -81,7 +81,7 @@ exports.weeklyBadgeCheck = onSchedule(
         }
       }
 
-      const weightWatcherBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('weight_Watcher');
+      const weightWatcherBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('weight_watcher');
       const weightWatcherBadgeSnap = await weightWatcherBadgeRef.get();
       if (!weightWatcherBadgeSnap.exists) {
         const weightsSnap = await db.collection('Users').doc(uid).collection('User_Weight').where('time', '>=', oneWeekAgo).get();
@@ -104,7 +104,7 @@ exports.weeklyBadgeCheck = onSchedule(
         }
       }
 
-      const itTakesTwoToTangoBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('it_Takes_Two_To_Tango');
+      const itTakesTwoToTangoBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('it_takes_two_to_tango');
       const itTakesTwoToTangoBadgeSnap = await itTakesTwoToTangoBadgeRef.get();
       if (!itTakesTwoToTangoBadgeSnap.exists) {
         const noOfFriends = userDoc.data().friends.length;
@@ -113,7 +113,7 @@ exports.weeklyBadgeCheck = onSchedule(
         }
       }
 
-      const networkKingBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('network_King');
+      const networkKingBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('network_king');
       const networkKingBadgeSnap = await networkKingBadgeRef.get();
       if (!networkKingBadgeSnap.exists) {
         const noOfFriends = userDoc.data().friends.length;
