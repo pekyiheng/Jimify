@@ -39,8 +39,8 @@ function Friends({ friendUserId, onRemove, onViewProfile }) {
 }
 
 function IncomingRequest({ fromUserId, onAccept, onReject }) {
-
     const [fromUsername, setFromUsername] = useState("");
+    const [profilePicture, setProfilePicture] = useState("");
 
     useEffect(() => {
         const fetchFromUsername = async () => {
@@ -48,6 +48,7 @@ function IncomingRequest({ fromUserId, onAccept, onReject }) {
                 const docSnap = await getDoc(doc(db, "Users", fromUserId));
                 const data = docSnap.data();
                 setFromUsername(data?.Username || "Unknown");
+                setProfilePicture(data.Profile_Picture || "");
             } catch (e) {
                 console.error(e);
                 return null;
@@ -58,15 +59,22 @@ function IncomingRequest({ fromUserId, onAccept, onReject }) {
 
     return (
         <>
-            <p>{fromUsername}</p>
-            <button className="button" onClick={onAccept}>Accept</button>
-            <button className="button" onClick={onReject}>Reject</button>
+            {profilePicture 
+                ? (<img id="FriendEntryProfilePic" src={profilePicture} className="profilePicture"/>)
+                : (<VscAccount size={50}/>)}
+            <p id="friendName">{fromUsername}</p>
+            <div className="buttonContainerFriend">
+                <button className="button" onClick={onAccept}>Accept</button>
+                <button className="button" onClick={onReject}>Reject</button>
+            </div>
         </>
     );
 }
 
 function OutgoingRequest({ toUserId }) {
     const [toUsername, setToUsername] = useState("");
+    const [profilePicture, setProfilePicture] = useState("");
+
 
     useEffect(() => {
         const fetchToUsername = async () => {
@@ -74,6 +82,7 @@ function OutgoingRequest({ toUserId }) {
                 const docSnap = await getDoc(doc(db, "Users", toUserId));
                 const data = docSnap.data();
                 setToUsername(data?.Username || "Unknown");
+                setProfilePicture(data.Profile_Picture || "");
             } catch (e) {
                 console.error(e);
                 return null;
@@ -84,8 +93,11 @@ function OutgoingRequest({ toUserId }) {
         
     return (
         <>
-            <p>{toUsername}</p>
-            <p>Status: PENDING</p>
+            {profilePicture 
+                ? (<img id="FriendEntryProfilePic" src={profilePicture} className="profilePicture"/>)
+                : (<VscAccount size={50}/>)}
+            <p id="friendName">{toUsername}</p>
+            <p id="statusText">Status: PENDING</p>
         </>
     );
 }
@@ -265,10 +277,10 @@ const FriendsPage = () => {
             </ul>
             <h2>Incoming Requests:</h2>
             <ul> {incomingRequests.map((entry, index) => 
-                (<li key={entry.id}><IncomingRequest fromUserId={entry.fromUserId} onAccept={() => handleAccept(entry.id, entry.fromUserId)} onReject={() => handleReject(entry.id)}/></li>))}</ul>
+                (<li className="FriendEntry" key={entry.id}><IncomingRequest fromUserId={entry.fromUserId} onAccept={() => handleAccept(entry.id, entry.fromUserId)} onReject={() => handleReject(entry.id)}/></li>))}</ul>
             <h2>Outgoing Requests:</h2>
             <ul> {outgoingRequests.map((entry, index) => 
-                (<li key={entry.id}><OutgoingRequest toUserId={entry.toUserId}/></li>))}
+                (<li className="FriendEntry" key={entry.id}><OutgoingRequest toUserId={entry.toUserId}/></li>))}
             </ul>
             
         </div>

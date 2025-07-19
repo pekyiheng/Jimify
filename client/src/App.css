@@ -134,7 +134,7 @@
   align-items: center;
 }
 #training_log_ctn {
-  max-width: 300px;
+  max-width: 350px;
 }
 .input {
   height: 100%;
@@ -304,9 +304,12 @@ dialog::backdrop {
   align-self: center;
   margin:10px;
 }
-.buttonContainerFriend {
+.buttonContainerFriend, #statusText {
   display: inline;
   margin-left: auto;
+}
+#statusText {
+  margin-top: 10px;
 }
 #FriendEntryProfilePic {
   height: 50px;
