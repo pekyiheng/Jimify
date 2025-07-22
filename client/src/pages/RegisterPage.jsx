@@ -56,7 +56,7 @@ const RegisterPage = () => {
             <h2>Register</h2>
             <form onSubmit={handleSubmit}>
                 <div className="inputContainer">
-                    <input type="email" placeholder="Email" className="input" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                    <input type="text" placeholder="Email" className="input" value={email} onChange={(e) => setEmail(e.target.value)}/>
                     <FaUser className="loginIcon"/>
                 </div>
 
