@@ -14,22 +14,17 @@ const createMockDocumentSnapshot = (id, data = {}, exists = true) => ({
             Lunch: {},
             Dinner: {},
             Snacks: {},
-            // Add any other meal types your app uses if necessary
         },
-        // ... any other default top-level fields your document might have
     };
-    // Merge the provided data with the default structure
     return { ...defaultData, ...data };
     })
   });
   
-  // Mock a QuerySnapshot for `getDocs` results
   const createMockQuerySnapshot = (docsArray = []) => ({
     empty: docsArray.length === 0,
     docs: docsArray.map(doc => createMockDocumentSnapshot(doc.id, doc.data)),
     size: docsArray.length,
     forEach: jest.fn((callback) => docsArray.forEach(doc => callback(createMockDocumentSnapshot(doc.id, doc.data)))),
-    // Add other properties if your components use them
   });
   
   // Mock for a DocumentReference. This is what `doc()` returns.
