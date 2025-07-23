@@ -116,6 +116,7 @@ const FriendsPage = () => {
         try {
             const q = query(collection(db, "FriendRequests"), where("fromUserId", "==", uid), where("status", "==", "pending"));
             const docSnap = await getDocs(q);
+            console.log("fetching outgoing requests");
             const data = docSnap.docs.map((docSnap) => {
                 const docData = docSnap.data();
                 return {
@@ -134,6 +135,7 @@ const FriendsPage = () => {
         try {
             const q = query(collection(db, "FriendRequests"), where("toUserId", "==", uid), where("status", "==", "pending"));
             const docSnap = await getDocs(q);
+            console.log("fetching incoming requests")
             const data = docSnap.docs.map((docSnap) => {
                 const docData = docSnap.data();
                 return {
@@ -184,6 +186,7 @@ const FriendsPage = () => {
 
         const toUsername = addFriend;
         if (toUsername === ownUsername) {
+            console.log("here1");
             alert("Please select another user");
             return;
         }
@@ -195,6 +198,7 @@ const FriendsPage = () => {
             const toUserDoc = toUserIdSnapshot.docs[0];
             toUserId = toUserDoc.id;
         } else {
+            console.log("here2");
             alert("No user found with that username");
             return;
         }
@@ -202,6 +206,7 @@ const FriendsPage = () => {
         const existingRequest = query(collection(db, "FriendRequests"), where("fromUserId", "==", userId), where("toUserId", "==", toUserId), where("status", "==", "pending"))
         const requestExists = await getDocs(existingRequest);
         if (!requestExists.empty) {
+            console.log("here3");
             alert("Friend request already sent");
             return;
         }
@@ -215,6 +220,7 @@ const FriendsPage = () => {
         try {
             const docId = Date.now().toString();
             const friendRequestDocRef = doc(db, "FriendRequests", docId);
+            console.log("setdoc called with:", toUserId);
             const docRef = await setDoc(friendRequestDocRef, entry);
             console.log("Friend Request sent: ", docId);
             setAddFriend("");
