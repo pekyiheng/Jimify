@@ -65,7 +65,7 @@ exports.weeklyBadgeCheck = onSchedule(
       const babyStepsBadgeSnap = await babyStepsBadgeRef.get();
       if (!babyStepsBadgeSnap.exists) {
         const userEXP = userDoc.data().exp;
-        const userLevel = Math.floor(Math.pow(exp / 100, 2/3));
+        const userLevel = Math.floor(Math.pow(userEXP / 100, 2/3));
         if (userLevel >= 1) {
           await babyStepsBadgeRef.set({earnedOn: now}, {merge: true});
         }
@@ -75,7 +75,7 @@ exports.weeklyBadgeCheck = onSchedule(
       const consistencyIsKingBadgeSnap = await consistencyIsKingBadgeRef.get();
       if (!consistencyIsKingBadgeSnap.exists) {
         const userEXP = userDoc.data().exp;
-        const userLevel = Math.floor(Math.pow(exp / 100, 2/3));
+        const userLevel = Math.floor(Math.pow(userEXP / 100, 2/3));
         if (userLevel >= 10) {
           await consistencyIsKingBadgeRef.set({earnedOn: now}, {merge: true});
         }
@@ -109,7 +109,7 @@ exports.weeklyBadgeCheck = onSchedule(
       if (!foodFighterBadgeSnap.exists) {
         const dailyCaloricGoal = userDoc.data().Daily_Calories;
         const userCaloriesSnap = await db.collection('Users').doc(uid).collection('User_Calories').where('time', '>=', oneWeekAgo).get();
-        if (userCaloriesSnap.size >= 1) {
+        if (userCaloriesSnap.size >= 1) { //change this to 7
           let streak = 0;
           for (doc in userCaloriesSnap.docs) {
             const curDayTotalCal = doc.data().totalCalories;
@@ -118,7 +118,7 @@ exports.weeklyBadgeCheck = onSchedule(
             }
           }
 
-          if (streak == 7) {
+          if (streak == 1) { //change this to 7
             await foodFighterBadgeRef.set({earnedOn: now}, {merge: true});
           }
         }
