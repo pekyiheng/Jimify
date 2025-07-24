@@ -104,6 +104,26 @@ exports.weeklyBadgeCheck = onSchedule(
         }
       }
 
+      const foodFighterBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('food_fighter');
+      const foodFighterBadgeSnap = await foodFighterBadgeRef.get();
+      if (!foodFighterBadgeSnap.exists) {
+        const dailyCaloricGoal = userDoc.data().Daily_Calories;
+        const userCaloriesSnap = await db.collection('Users').doc(uid).collection('User_Calories').where('time', '>=', oneWeekAgo).get();
+        if (userCaloriesSnap.size >= 1) {
+          let streak = 0;
+          for (doc in userCaloriesSnap.docs) {
+            const curDayTotalCal = doc.data().totalCalories;
+            if (curDayTotalCal >= dailyCaloricGoal * 0.95 && curDayTotalCal <= dailyCaloricGoal * 1.05) {
+              streak++;
+            }
+          }
+
+          if (streak == 7) {
+            await foodFighterBadgeRef.set({earnedOn: now}, {merge: true});
+          }
+        }
+      }
+
       const itTakesTwoToTangoBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('it_takes_two_to_tango');
       const itTakesTwoToTangoBadgeSnap = await itTakesTwoToTangoBadgeRef.get();
       if (!itTakesTwoToTangoBadgeSnap.exists) {
