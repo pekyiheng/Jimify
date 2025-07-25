@@ -219,7 +219,15 @@ const FriendsPage = () => {
             return;
         }
 
-        const existingRequest = query(collection(db, "FriendRequests"), where("fromUserId", "==", userId), where("toUserId", "==", toUserId), where("status", "==", "pending"))
+        const friendRequestedSelf = query(collection(db, "FriendRequests"), where("fromUserId", "==", toUserId), where("toUserId", "==", userId), where("status", "==", "pending"));
+        const friendRequestSelfExists = await getDocs(friendRequestedSelf);
+        if (!friendRequestSelfExists.empty) {
+            const requestDoc = friendRequestSelfExists.docs[0];
+            await handleAccept(requestDoc.id, toUserId);
+            return;
+        }
+
+        const existingRequest = query(collection(db, "FriendRequests"), where("fromUserId", "==", userId), where("toUserId", "==", toUserId), where("status", "==", "pending"));
         const requestExists = await getDocs(existingRequest);
         if (!requestExists.empty) {
             alert("Friend request already sent");
