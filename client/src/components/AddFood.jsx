@@ -112,6 +112,7 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
             console.log("Food item added successfully!");
 
             onFoodChange();
+            await fetchFoodList(userId);
         } catch (error) {
             console.error("Error adding food item:", error);
         }
@@ -202,12 +203,12 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
                             {boolCustomFood && (
                                 <div id='customFood'>
                                     <div id='food'>
-                                        <label>Food</label>
-                                        <input name='foodItem' type='text' onChange={(e) => setNewFood(e.target.value)}></input>
+                                        <label htmlFor='foodItemInput'>Food</label>
+                                        <input name='foodItem' id="foodItemInput" type='text' onChange={(e) => setNewFood(e.target.value)}></input>
                                     </div>
                                     <div>
-                                        <label>Cal</label>
-                                        <input name='caloriesVal' type='number' placeholder='0' value={newCal} onChange={e => handleNewCalChange(e.target.value)}></input>
+                                        <label htmlFor='caloriesInput'>Cal</label>
+                                        <input id='caloriesInput' name='caloriesVal' type='number' placeholder='0' value={newCal} onChange={e => handleNewCalChange(e.target.value)}></input>
                                     </div>
                                 </div>
                             )}
