@@ -19,6 +19,9 @@ const TrainingPage = () => {
     const [workoutForLogging, setWorkoutForLogging] = useState([]);
     const [showAllWorkouts, setShowAllWorkouts] = useState(false);
 
+    const [showingStandardPlans, setShowingStandardPlans] = useState(false);
+    const [standardWorkoutPlans, setStandardWorkoutPlans] = useState([]);
+
     const pastSevenDaysWorkouts = () => {
         const now = new Date();
         const oneWeekAgo = new Date();
@@ -86,6 +89,10 @@ const TrainingPage = () => {
                     time: docData.time.toDate(),
                 };
             });
+
+            if (data.length < 3) {
+                await fetchStandardWorkoutPlans();
+            }
     
             setWorkoutPlan(data);
         }
@@ -167,6 +174,24 @@ const TrainingPage = () => {
         catch (e) {
             console.error(e);
             return null;
+        }
+    }
+
+    const fetchStandardWorkoutPlans = async () => {
+        const standardColRef = collection(db, "Standard_Workout_Plans");
+
+        try {
+            const docSnap = await getDocs(standardColRef);
+            let data =  docSnap.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            setStandardWorkoutPlans(data);
+            setShowingStandardPlans(true);
+        } catch (e) {
+            console.error(e);
+            return [];
         }
     }
     
@@ -284,6 +309,61 @@ const TrainingPage = () => {
                 <button onClick={onDelete} className="button">Delete</button>
             </div>
         );
+    }
+
+    function StandardWorkoutPlan({ name, exercise, addWorkout }) {
+        return (
+            <div>
+                <h3>{name}</h3>
+                {exercise}
+                <button onClick={addWorkout} className="button">Add Workout</button>
+            </div>
+        )
+    }
+
+    const handleAddStandardPlan = async (plan) => {
+        const time = new Date();
+        const newPlanName = plan.workoutName;
+
+        const nameExists = oldWorkoutPlan.some(p => p.workoutName.toLowerCase().trim() === newPlanName.toLowerCase().trim());
+        if (nameExists) {
+            alert("You already have a plan with this name");
+            return;
+        }
+
+        const userWeight = oldWeight[oldWeight.length - 1]?.value ?? 60;
+        const convertedExercises = plan.exercises.map(ex => ({
+            exercise: ex.exercise,
+            bodyPart: ex.bodyPart,
+            weight: Math.round(ex.weightMultiplier * userWeight),
+            sets: ex.sets,
+            reps: ex.reps,
+            restMinutes: ex.restMinutes,
+            restSeconds: ex.restSeconds
+        }));
+
+        const entry = {
+            workoutName: newPlanName,
+            exercises: convertedExercises,
+            time,
+        }
+        const activityEntry = {
+            note: `Standard workout plan '${newPlanName}' added`,
+            time
+        }
+
+        try {
+            const docId = Date.now().toString();
+            const userWorkoutPlanDocRef = doc(db, "Users", userId, "User_Workout_Plan", docId);
+            await setDoc(userWorkoutPlanDocRef, entry);
+            setWorkoutPlan(prev => [...prev, { ...entry, id: docId }]);
+
+            const userActivityDocRef = doc(db, "Users", userId, "Activity_Log", docId);
+            await setDoc(userActivityDocRef, activityEntry);
+            alert("Standard workout plan added!");
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     const handleNewWorkout = async (e) => {
@@ -504,6 +584,38 @@ const TrainingPage = () => {
                                 startWorkout={() => handleStartWorkout(entry.id)}
                                 onDelete={() => handleDeleteWorkoutPlan(entry.id)}/></li>))}
                 </ul>
+            </div>
+
+
+            <div>
+                {showingStandardPlans && (
+                    <div>
+                        <h2>Basic plans tailored for you!</h2>
+                        <ul className="horizontalListOfBoxes">
+                            {standardWorkoutPlans.map((entry) => (
+                                <li className="listItemInBox" key={entry.id}>
+                                <StandardWorkoutPlan
+                                    name={entry.workoutName} 
+                                    exercise={
+                                        <ul>
+                                            {entry.exercises.map((e, index) => {
+                                                const userWeight = oldWeight[oldWeight.length - 1]?.value ?? 60;
+                                                const weight = Math.round(e.weightMultiplier * userWeight);
+                                                return (
+                                                    <li key={index}>{e.exercise} ({weight}KG) - {e.sets} sets x {e.reps} reps
+                                                    <br/>
+                                                    Rest between sets: {e.restMinutes} min {String(e.restSeconds).padStart(2, "0")} s</li>
+                                                );
+                                            })} 
+                                        </ul>
+                                    }
+                                    addWorkout={() => handleAddStandardPlan(entry)}
+                                    />
+                            </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
             </div>
 
             <div>
