@@ -1,7 +1,7 @@
 import CaloriesWidget from '../components/CaloriesWidget';
 import WeightWidget from '../components/WeightWidget';
 import { useState, useEffect } from 'react';
-import { getDoc, doc, increment } from "firebase/firestore";
+import { getDoc, getDocs, doc, collection, query, where } from "firebase/firestore";
 import { db, auth } from "../firebase_config"
 import { formatDateToYYYYMMDD } from '../helper';
 import { Link } from "react-router-dom"
@@ -18,6 +18,7 @@ const NutritionPage = () => {
 
   const fetchData = async () => {
     const userCaloriesDocRef = doc(db, "Users", auth.currentUser.uid, "User_Calories", curDate);
+    
     try {
       const caloriesDocSnap = await getDoc(userCaloriesDocRef);
       if (caloriesDocSnap.exists) {

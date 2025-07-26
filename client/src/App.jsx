@@ -34,7 +34,6 @@ function App() {
     const userDocRef = doc(db, 'Users', uid);
     
     try {
-      console.log("fetching user..." + uid)
       const docSnap = await getDoc(userDocRef);
       setUserId(uid);
       setLoadingAuth(false);
@@ -63,7 +62,6 @@ function App() {
   }
   
   if (userId != null) {
-    console.log(toOnboard);
     if (toOnboard) {
       return (
         <div className='app'>

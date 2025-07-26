@@ -17,6 +17,7 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
     const [boolCustomFood, setBoolCustomFood] = useState(false);
     const [showErr, setShowErr] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [keyPress, setKeyPress] = useState("");
 
     useEffect(() => {
         fetchFoodList(userId);
@@ -45,18 +46,25 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
 
     const handleSearch = async (userInput) => {
 
-        if (userInput == '') {
+        if (userInput == '' || keyPress === 'Backspace') {
             return;
         }
 
         try {
-          console.log(userInput)
           const response = await axios.get(`https://api-tptl253ghq-uc.a.run.app/fatsecret/searchFood?q=${userInput}`);
           if (response.data.length > 0) {
             setSearchedFoodList(response.data);
+            console.log(response.data);
+            const foodObj = response.data;
+            setNewFood(foodObj[0]['food_name']);
+            const food_description = foodObj[0]['food_description'];
+            setServingSizePerc(100); 
+            setSelectedFoodCalValue(extractCalories(food_description));
+            handleNewCalChange(extractCalories(food_description));
           }
         } catch (error) {
-          console.error("Error fetching food list:", error);
+            setSearchedFoodList([]);
+            console.error("Error fetching food list:", error);
         }
       };
 
@@ -167,8 +175,8 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
         <div className="addfood">
             <h3>{mealType}</h3>
             <ul>
-                {foodList.map((foodItem) => (
-                    <li key={foodItem.foodItem}>
+                {foodList.map((foodItem, idx) => (
+                    <li key={foodItem.foodItem + '_' + idx}>
                         {foodItem.foodItem} 
                         <span> - </span>
                         <span>{foodItem.calories} kcal</span>
@@ -184,7 +192,7 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
                                 <div id='useAPI'>
                                     <div id='searchFood'>
                                         <label>Search Food</label>
-                                        <input name='foodItem' type='text' value={newFood} onChange={(e) => {setNewFood(e.target.value);handleSearch(e.target.value)}}>
+                                        <input name='foodItem' type='text' onKeyDown={e => setKeyPress(e.key)} onChange={(e) => {setNewFood(e.target.value);handleSearch(e.target.value)}}>
                                         </input>
                                         <select onChange={e => handleSelectItem(e.target.value)}>
                                             {searchedFoodList.map((foodItem) => (
