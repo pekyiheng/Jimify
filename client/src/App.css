@@ -16,6 +16,39 @@
   align-self: self-start;
   margin: 10px;
 }
+select, #heightField, #birthdateField {
+  padding: 10px;
+  border: 1px solid #ccc; 
+  border-radius: 5px; 
+  background-color: #f9f9f9; 
+  color: #333; 
+  font-family: Arial, sans-serif; 
+  font-size: 16px; 
+  cursor: pointer;
+}
+select:hover {
+  border-color: #666; 
+}
+
+select:focus {
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem 2rem;
+  align-items: center;
+}
+
+.form-grid label {
+  justify-self: end;
+}
+
+.form-grid input,
+.form-grid select {
+  width: 100%;
+  box-sizing: border-box;
+}
 .delete_btn_weight {
   margin-left: auto; 
   align-content: center;

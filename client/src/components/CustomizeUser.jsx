@@ -121,39 +121,42 @@ const CustomizeUser = () => {
                 </header>
                 <div>
                     <form onSubmit={handleSubmit}>
-                        <label htmlFor='genderField' >Gender </label>
-                        <select required id='genderField' value={gender} onChange={e => setGender(e.target.value)} >
-                            <option value='M' >Male</option>
-                            <option value='F' >Female</option>
-                        </select>
-                        <br></br>
-                        <label htmlFor='birthdateField' >Birthdate </label>
-                        <input required id='birthdateField' type='date' value={birthdate} onChange={handleBirthdateChange} ></input>
-                        <br></br>
-                        <label htmlFor='heightField' >Height</label>
-                        <input required id='heightField' type='number' value={height} onChange={handleHeightChange} ></input>
-                        <br></br>
-                        <label htmlFor='goalField' >Current goal </label>
-                        <select required id="goalField" name="goalField" value={goal} onChange={(e) => setGoal(e.target.value)}>
-                            <option value="gain fast">Gain weight (fast)</option>
-                            <option value="gain slow">Gain weight (slow)</option>
-                            <option value="maintain">Maintain weight</option>
-                            <option value="lose slow">Lose weight (slow)</option>
-                            <option value="lose fast">Lose weight (fast 0.5kg/week)</option>
-                        </select>
-                        <br></br>
-                        <label htmlFor='activityField' >Activity Level </label>
-                        <select required id="activityField" name="activityField" value={activityLevel} onChange={(e) => setActivityLevel(e.target.value)} >
-                            <option value="sedentary">Sedentary</option>
-                            <option value="light">Lightly active</option>
-                            <option value="moderate">Moderately active</option>
-                            <option value="active">Active</option>
-                            <option value="very active">Very active</option>
-                        </select>
+                        <div className="form-grid">
+                            <label htmlFor='genderField'>Gender</label>
+                            <select required id='genderField' value={gender} onChange={e => setGender(e.target.value)}>
+                                <option value='M'>Male</option>
+                                <option value='F'>Female</option>
+                            </select>
+
+                            <label htmlFor='birthdateField'>Birthdate</label>
+                            <input required id='birthdateField' type='date' value={birthdate} onChange={handleBirthdateChange} />
+
+                            <label htmlFor='heightField'>Height</label>
+                            <input required id='heightField' type='number' value={height} onChange={handleHeightChange} />
+
+                            <label htmlFor='goalField'>Current goal</label>
+                            <select required id="goalField" name="goalField" value={goal} onChange={(e) => setGoal(e.target.value)}>
+                                <option value="gain fast">Gain weight (fast)</option>
+                                <option value="gain slow">Gain weight (slow)</option>
+                                <option value="maintain">Maintain weight</option>
+                                <option value="lose slow">Lose weight (slow)</option>
+                                <option value="lose fast">Lose weight (fast 0.5kg/week)</option>
+                            </select>
+
+                            <label htmlFor='activityField'>Activity Level</label>
+                            <select required id="activityField" name="activityField" value={activityLevel} onChange={(e) => setActivityLevel(e.target.value)}>
+                                <option value="sedentary">Sedentary</option>
+                                <option value="light">Lightly active</option>
+                                <option value="moderate">Moderately active</option>
+                                <option value="active">Active</option>
+                                <option value="very active">Very active</option>
+                            </select>
+                        </div>
+
                         <h4>Current weight: {weight} kg</h4>
-                        <input type='submit' value="Save" className='button' ></input>
+                        <input type='submit' value="Save" className='button' />
                         <button type='button' onClick={toggleDialog}>Close</button>
-                    </form>
+                        </form>
                     <p>Daily calories goal: {dailyCalories}</p>
                 </div>
                 
