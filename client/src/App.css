@@ -40,6 +40,12 @@ select:focus {
   align-items: center;
 }
 
+#customFood {
+  display: grid;
+  grid-template-columns: 40px 180px;
+  gap: 10px;
+}
+
 .form-grid label {
   justify-self: end;
 }
@@ -357,4 +363,7 @@ dialog::backdrop {
 .rightContent {
   text-align: left;
   margin-left: 10px;
+}
+#dialogBox {
+  max-width: 800px;
 }

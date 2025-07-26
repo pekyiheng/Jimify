@@ -208,15 +208,11 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
                                 </div>
                             )}
                             {boolCustomFood && (
-                                <div id='customFood'>
-                                    <div id='food'>
-                                        <label>Food</label>
-                                        <input name='foodItem' type='text' onChange={(e) => setNewFood(e.target.value)}></input>
-                                    </div>
-                                    <div>
-                                        <label>Cal</label>
-                                        <input name='caloriesVal' type='number' placeholder='0' value={newCal} onChange={e => handleNewCalChange(e.target.value)}></input>
-                                    </div>
+                                <div id='customFood' className='form-grid'>
+                                    <label>Food</label>
+                                    <input name='foodItem' type='text' onChange={(e) => setNewFood(e.target.value)}></input>
+                                    <label>Cal</label>
+                                    <input name='caloriesVal' type='number' placeholder='0' value={newCal} onChange={e => handleNewCalChange(e.target.value)}></input>
                                 </div>
                             )}
                             
