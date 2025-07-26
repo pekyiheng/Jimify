@@ -107,8 +107,19 @@ exports.weeklyBadgeCheck = onSchedule(
       const foodFighterBadgeRef = db.collection('Users').doc(uid).collection('User_Badges').doc('food_fighter');
       const foodFighterBadgeSnap = await foodFighterBadgeRef.get();
       if (!foodFighterBadgeSnap.exists) {
-        const dailyCaloricGoal = userDoc.data().Daily_Calories;
-        const userCaloriesSnap = await db.collection('Users').doc(uid).collection('User_Calories').where('time', '>=', oneWeekAgo).get();
+        const today = new Date();
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(today.getDate() - 7);
+
+        const start = oneWeekAgo.toISOString().slice(0, 10); // "yyyy-mm-dd"
+        const end = today.toISOString().slice(0, 10);
+
+        const userCaloriesRef = db.collection('Users').doc(uid).collection('User_Calories');
+        const userCaloriesSnap = await userCaloriesRef
+          .where(admin.firestore.FieldPath.documentId(), '>=', start)
+          .where(admin.firestore.FieldPath.documentId(), '<=', end)
+          .get();
+
         if (userCaloriesSnap.size >= 1) { //change this to 7
           let streak = 0;
           for (doc in userCaloriesSnap.docs) {
