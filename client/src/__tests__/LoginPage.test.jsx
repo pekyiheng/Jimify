@@ -106,6 +106,35 @@ describe('LoginPage', () => {
 
     const errorMessage = await screen.findByText(/No user found with this email/i);
     expect(errorMessage).toBeInTheDocument();
+  });
+
+  test('shows error if email is not verified after registration', async () => {
+    signInWithEmailAndPassword.mockRejectedValueOnce({
+      user: {
+        uid: 'randomuid',
+        email: 'unverified@example.com',
+        emailVerified: false
+      }
+    });
+
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText(/Email/i), {
+      target: { value: 'unverified@example.com' }
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Password/i), {
+      target: { value: 'somepassword' }
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /login/i }));
+
+    const unverifiedMessage = await screen.findByText("Login failed. Please try again.");
+    expect(unverifiedMessage).toBeInTheDocument();
+    expect(mockNavigate).not.toHaveBeenCalled();
   })
 
   test('shows error on wrong password', async () => {
@@ -131,7 +160,7 @@ describe('LoginPage', () => {
 
     const errorMessage = await screen.findByText(/Incorrect password/i);
     expect(errorMessage).toBeInTheDocument();
-  })
+  });
 
   test('sends password reset email', async () => {
     sendPasswordResetEmail.mockResolvedValueOnce();

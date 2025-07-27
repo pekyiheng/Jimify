@@ -75,6 +75,29 @@ describe('RegisterPage', () => {
       );
       expect(mockNavigate).toHaveBeenCalledWith('/loginPage');
     })
+  });
+
+  test('shows error when passwords do not match', async () => {
+    render(
+      <MemoryRouter>
+        <RegisterPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('Email'), {
+      target: { value: 'registered@example.com' }
+    });
+    fireEvent.change(screen.getByPlaceholderText('Password'), {
+      target: { value: 'password1' }
+    });
+    fireEvent.change(screen.getByPlaceholderText('Confirm Password'), {
+      target: { value: 'password' }
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /register/i }));
+
+    const errorMessage = await screen.findByText(/Passwords do not match/i);
+    expect(errorMessage).toBeInTheDocument();  
   })
 
   test('shows error on registered email', async () => {
