@@ -128,7 +128,8 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
         }
         
         try {
-            const newTotalCalories = docSnap.data().totalCalories + calToAdd;
+            const totalCalories = docSnap.data()?.totalCalories ?? 0;
+            const newTotalCalories = totalCalories + calToAdd;
             await setDoc(userCaloriesDocRef, {
               Meal_Map: {
                 [mealType]: {
