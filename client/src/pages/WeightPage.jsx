@@ -194,7 +194,9 @@ const WeightPage = () => {
                     value={newWeight}
                     onChange={(e) => setNewWeight(e.target.value)}
                 />
+                <label htmlFor="weightImageUpload">Upload Image</label>
                 <input 
+                    id="weightImageUpload"
                     type="file"
                     accept="image/*"
                     onChange={(e) => setImageFile(e.target.files[0])}
