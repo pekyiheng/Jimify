@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { getDoc, updateDoc, setDoc, deleteField, doc, increment } from "firebase/firestore";
 import { db, auth } from "../firebase_config"
 import { onAuthStateChanged } from "firebase/auth";
@@ -10,14 +10,28 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
     const [foodList, setFoodList] = useState([]);
     const [newFood, setNewFood] = useState("");
     const [newCal, setNewCal] = useState(0);
+    const [dailyCaloriesGoal, setDailyCaloriesGoal] = useState(0);
     const [selectedFoodCalValue, setSelectedFoodCalValue] = useState(0);
-    const [servingSizeGram, setServingSizeGram] = useState(0);
     const [servingSizePerc, setServingSizePerc] = useState(100);
     const [searchedFoodList, setSearchedFoodList] = useState([]);
     const [boolCustomFood, setBoolCustomFood] = useState(false);
     const [showErr, setShowErr] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [keyPress, setKeyPress] = useState("");
+
+    useEffect(() => {
+        fetchUserCaloriesGoal(userId);
+    }, [])
+
+    const fetchUserCaloriesGoal = async (uid) => {
+        const userDocRef = doc(db, "Users", uid);
+        try {
+            const docSnap = await getDoc(userDocRef);
+            setDailyCaloriesGoal(docSnap.data().Daily_Calories);
+        } catch (error) {
+            console.error("Error fetching user calories goal:", error);
+        }
+    }
 
     useEffect(() => {
         fetchFoodList(userId);
@@ -44,6 +58,11 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
         }
     }
 
+    const addNewFood = (foodItem) => {
+        const sanitizedFood = foodItem.replace(/[~*\/\[\]]/g, '_').trim();            
+        setNewFood(sanitizedFood);
+    }
+
     const handleSearch = async (userInput) => {
 
         if (userInput == '' || keyPress === 'Backspace') {
@@ -54,9 +73,8 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
           const response = await axios.get(`https://api-tptl253ghq-uc.a.run.app/fatsecret/searchFood?q=${userInput}`);
           if (response.data.length > 0) {
             setSearchedFoodList(response.data);
-            console.log(response.data);
             const foodObj = response.data;
-            setNewFood(foodObj[0]['food_name']);
+            addNewFood(foodObj[0]['food_name']);
             const food_description = foodObj[0]['food_description'];
             setServingSizePerc(100); 
             setSelectedFoodCalValue(extractCalories(food_description));
@@ -70,7 +88,7 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
 
       const handleSelectItem = (foodID) => {
         const foodObj = searchedFoodList.filter(foodItem => foodItem['food_id'] == foodID)
-        setNewFood(foodObj[0]['food_name']);
+        addNewFood(foodObj[0]['food_name']);
         const food_description = foodObj[0]['food_description'];
         setServingSizePerc(100); 
         setSelectedFoodCalValue(extractCalories(food_description));
@@ -93,6 +111,7 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
     const handleAddFood = async (e) => {
         e.preventDefault();
         const userCaloriesDocRef = doc(db, "Users", userId, "User_Calories", curDate);
+        const docSnap = await getDoc(userCaloriesDocRef);
         const calToAdd = parseInt(newCal, 10);
 
         if (newFood == "") {
@@ -109,17 +128,24 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
         }
         
         try {
+            const newTotalCalories = docSnap.data().totalCalories + calToAdd;
             await setDoc(userCaloriesDocRef, {
               Meal_Map: {
                 [mealType]: {
                     [newFood]: calToAdd
                 }
               },
-              totalCalories: increment(calToAdd)
+              totalCalories: newTotalCalories
             }, {merge: true});
-            console.log("Food item added successfully!");
+            
+            if (newTotalCalories > dailyCaloriesGoal * 0.95 && newTotalCalories < dailyCaloriesGoal * 1.05) {
+                await updateDoc(doc(db, "Users", userId), { 
+                    exp: increment(50)
+                });
+            }
 
             onFoodChange();
+            
         } catch (error) {
             console.error("Error adding food item:", error);
         }
@@ -131,6 +157,9 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
 
     const handleDeleteFood = async (foodItemToDelete, calToDecrement) => {
         const userCaloriesDocRef = doc(db, "Users", userId, "User_Calories", curDate);
+        const docSnap = await getDoc(userCaloriesDocRef);
+        const oldTotalCalories = docSnap.data().totalCalories;
+        const newTotalCalories = docSnap.data().totalCalories - calToDecrement;
 
         try {
             await updateDoc(userCaloriesDocRef, {
@@ -142,6 +171,14 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
             onFoodChange();
 
             setFoodList(foodList.filter(item => item.foodItem !== foodItemToDelete));
+
+            if (oldTotalCalories > dailyCaloriesGoal * 0.95 && oldTotalCalories < dailyCaloriesGoal * 1.05) {
+                if (!(newTotalCalories > dailyCaloriesGoal * 0.95 && newTotalCalories < dailyCaloriesGoal * 1.05)) {
+                    await updateDoc(doc(db, "Users", userId), { 
+                        exp: increment(-50)
+                    });
+                }
+            }
 
         } catch (error) {
             console.error("Error deleting food item:", error);
@@ -192,7 +229,7 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
                                 <div id='useAPI'>
                                     <div id='searchFood'>
                                         <label>Search Food</label>
-                                        <input name='foodItem' type='text' onKeyDown={e => setKeyPress(e.key)} onChange={(e) => {setNewFood(e.target.value);handleSearch(e.target.value)}}>
+                                        <input name='foodItem' type='text' onKeyDown={e => setKeyPress(e.key)} onChange={(e) => {addNewFood(e.target.value);handleSearch(e.target.value)}}>
                                         </input>
                                         <select onChange={e => handleSelectItem(e.target.value)}>
                                             {searchedFoodList.map((foodItem) => (
@@ -210,7 +247,7 @@ const AddFood = ({mealType, curDate, userId, onFoodChange}) => {
                             {boolCustomFood && (
                                 <div id='customFood' className='form-grid'>
                                     <label>Food</label>
-                                    <input name='foodItem' type='text' onChange={(e) => setNewFood(e.target.value)}></input>
+                                    <input name='foodItem' type='text' onChange={(e) => addNewFood(e.target.value)}></input>
                                     <label>Cal</label>
                                     <input name='caloriesVal' type='number' placeholder='0' value={newCal} onChange={e => handleNewCalChange(e.target.value)}></input>
                                 </div>

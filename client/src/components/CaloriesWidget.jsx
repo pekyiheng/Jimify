@@ -1,7 +1,6 @@
 import { CircularProgressbarWithChildren, buildStyles } from 'react-circular-progressbar';
 
 const CaloriesWidget = ({totalCalories, dailyCaloriesGoal}) => {
-    console.log(totalCalories / dailyCaloriesGoal);
     var percentage = 0;
     if (dailyCaloriesGoal) {
         percentage = Math.round(totalCalories / dailyCaloriesGoal * 100);

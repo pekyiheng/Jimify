@@ -72,7 +72,6 @@ const CustomizeUser = () => {
     useEffect(() => {
         if (!birthdate) return;
         const age = new Date().getFullYear() - new Date(birthdate).getFullYear();
-        console.log(age);
         const dailyGoal = Math.round(calculateBMR(gender, weight, height, age, getActivityLevel(activityLevel)) + getGoal(goal));
         setDailyCalories(dailyGoal);
     }, [gender, height, birthdate, activityLevel, goal]);
