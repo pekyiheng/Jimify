@@ -228,7 +228,7 @@ describe('CaloriesPage', () => {
     // Wait for UI to update with new food
     await waitFor(() => {
       expect(screen.getByText('Test Add')).toBeInTheDocument();
-      expect(screen.getByText('2')).toBeInTheDocument();
+      expect(screen.getByText('2 kcal')).toBeInTheDocument();
     }, { timeout: 3000 });
   });
 
