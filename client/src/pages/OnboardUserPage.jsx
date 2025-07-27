@@ -82,7 +82,7 @@ const OnboardUser = ({setToOnboard}) => {
         {
             id: 0,
             content: <div className='registerHeader'>
-                        <h2>Welcome to Jimify! Let's set up yout profile </h2>
+                        <h2>Welcome to Jimify! Let's set up your profile </h2>
                     </div>
         },
         {

@@ -16,7 +16,7 @@
   align-self: self-start;
   margin: 10px;
 }
-select, #heightField, #birthdateField {
+select, #heightField, #birthdateField, #initialWeightField {
   padding: 10px;
   border: 1px solid #ccc; 
   border-radius: 5px; 
