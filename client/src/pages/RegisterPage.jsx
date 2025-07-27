@@ -17,6 +17,12 @@ const RegisterPage = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if (password !== confirmPassword) {
+            setHiddenTag(false);
+            setErrorMessage("Passwords do not match.");
+            return;
+        }
         try {
             const userCred = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCred.user;
