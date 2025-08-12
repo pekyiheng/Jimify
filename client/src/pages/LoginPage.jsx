@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link , useNavigate} from "react-router-dom";
 import '../App.css';
 import { auth } from '../firebase_config'; 
-import { signInWithEmailAndPassword, signInAnonymously, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail  } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail  } from "firebase/auth";
 import { FaUser } from "react-icons/fa";
 import { FaLock } from "react-icons/fa";
 import GoogleButton from "react-google-button";
@@ -19,8 +19,6 @@ const LoginPage = () => {
     const handleGoogleSignIn = () => {
         signInWithPopup(auth, provider)
         .then((result) => {
-            const credential = GoogleAuthProvider.credentialFromResult(result);
-            const token = credential.accessToken;
             const user = result.user;
             console.log(user.uid);
             navigate("/");

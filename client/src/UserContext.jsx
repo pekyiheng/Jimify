@@ -1,6 +1,5 @@
-// UserContext.jsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { db, auth } from './firebase_config';
 import { onAuthStateChanged } from 'firebase/auth';
 

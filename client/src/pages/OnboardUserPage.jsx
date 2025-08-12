@@ -1,7 +1,7 @@
 import React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { db } from "../firebase_config"
-import { getDocs, getDoc, setDoc, doc, query, collection, where } from "firebase/firestore";
+import { getDocs, setDoc, doc, query, collection, where } from "firebase/firestore";
 import { useUser } from "../UserContext";
 import { formatDateToYYYYMMDD, calculateBMR, getGoal, getActivityLevel } from '../helper';
 

@@ -4,7 +4,7 @@ function formatDateToYYYYMMDD(date) {
     }
   
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Add 1 because months are 0-indexed
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
   
     return `${year}-${month}-${day}`;
@@ -16,7 +16,7 @@ function formatDateToDDMMYYYY(date) {
  }
 
  const year = date.getFullYear();
- const month = String(date.getMonth() + 1).padStart(2, '0'); // Add 1 because months are 0-indexed
+ const month = String(date.getMonth() + 1).padStart(2, '0');
  const day = String(date.getDate()).padStart(2, '0');
 
  return `${day}-${month}-${year}`;
@@ -71,15 +71,5 @@ function extractCalories(nutritionFactsString) {
   }
   return null;
 }
-
-// function extractServingSize(nutritionFactsString) {
-//   const regex = /Per (\d+)g/;
-//   console.log(nutritionFactsString)
-//   const match = nutritionFactsString.match(regex);
-//   if (match && match[1]) {
-//     return parseInt(match[1], 10);
-//   }
-//   return null;
-// }
 
 export { formatDateToYYYYMMDD, formatDateToDDMMYYYY, calculateBMR, getGoal, getActivityLevel, extractCalories };

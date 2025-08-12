@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, query, where } from "firebase/firestore";
+import { collection, getDoc, getDocs, setDoc, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase_config"
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line } from 'react-chartjs-2';
@@ -110,7 +110,6 @@ const WeightPage = () => {
             try {
                 const docId = Date.now().toString();
                 const userWeightDocRef = doc(db, "Users", userId, "User_Weight", docId);
-                const userDocRef = doc(db, "Users", userId);
                 //updates weight in user document
                 updateUserWeightField(value);
                 //updates weight in user weight collection

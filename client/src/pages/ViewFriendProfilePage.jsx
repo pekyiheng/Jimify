@@ -1,15 +1,12 @@
 import { useState, useEffect } from "react";
-import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, updateDoc, increment, query, where } from "firebase/firestore";
+import { collection, getDoc, getDocs, doc, query, where } from "firebase/firestore";
 import { db } from "../firebase_config"
-import { useUser } from '../UserContext';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { VscAccount } from "react-icons/vsc";
 
 const ViewFriendProfilePage = () => {
-    const { exp, userId } = useUser();
     
     const location = useLocation();
-    const navigate = useNavigate();
     const { friendUserId } = location.state || {};
 
     const [activity, setActivity] = useState([]);
@@ -53,10 +50,6 @@ const ViewFriendProfilePage = () => {
             console.error(e);
             return null;
         }
-    }
-
-    const fetchBadges = async (uid) => {
-
     }
 
     const fetchDetails = async (uid) => {
