@@ -6,7 +6,6 @@ import NavBar from './components/NavBar'
 import Header from './components/Header'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth, db } from './firebase_config';
-import { useUser } from './UserContext'
 import ExperienceBar from './components/ExperienceBar'
 import OnboardUser from './pages/OnboardUserPage'
 

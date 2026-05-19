@@ -1,7 +1,3 @@
-import { useState, useEffect } from "react";
-import { collection, getDoc, getDocs, addDoc, setDoc, deleteDoc, doc, query, where } from "firebase/firestore";
-import { db, auth } from "../firebase_config"
-import { onAuthStateChanged } from "firebase/auth";
 import { useUser } from '../UserContext';
 
 const ExperienceBar = () => {
@@ -14,30 +10,6 @@ const ExperienceBar = () => {
     const diffBtnLevels = expForNextLevel - expForCurrentLevel;
     const progress = exp - expForCurrentLevel;
     const progressPercentage = (progress / diffBtnLevels) * 100;
-
-    /*
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                fetchExp(user.uid);
-            }
-        });
-        return () => unsubscribe();
-    }, [])
-
-    const fetchExp = async (uid) => {
-        const userRef = doc(db, "Users", uid);
-        
-        try {
-            const userSnap = await getDoc(userRef);
-            const exp = userSnap.exists() && !isNaN(userSnap.data().exp) ? userSnap.data().exp : 0;
-            setExp(exp);
-        }
-        catch (e) {
-            console.error(e);
-        }
-    }
-    */
     
     return (
         <div>
